@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Métodos Numéricos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" />
+  <style>
+    /* Estilo personalizado para el campo de texto */
+    #fp-equation, #newton-equation, #newton-derivative, #lagrange-points, #lagrange-x, #divided-diff-points, #divided-diff-x, #ls-points, #trapezoid-equation, #trapezoid-a, #trapezoid-b, #trapezoid-n, #simpson13-equation, #simpson13-a, #simpson13-b, #simpson13-n, #simpson38-equation, #simpson38-a, #simpson38-b, #simpson38-n {
+      color: #1F2937 !important; /* Negro oscuro para el texto ingresado */
+      background-color: #FFFFFF !important; /* Fondo blanco para mejor contraste */
+      border: 1px solid #D1D5DB !important; /* Borde gris claro */
+    }
+    #fp-equation::placeholder, #newton-equation::placeholder, #newton-derivative::placeholder, #lagrange-points::placeholder, #lagrange-x::placeholder, #divided-diff-points::placeholder, #divided-diff-x::placeholder, #ls-points::placeholder, #trapezoid-equation::placeholder, #trapezoid-a::placeholder, #trapezoid-b::placeholder, #trapezoid-n::placeholder, #simpson13-equation::placeholder, #simpson13-a::placeholder, #simpson13-b::placeholder, #simpson13-n::placeholder, #simpson38-equation::placeholder, #simpson38-a::placeholder, #simpson38-b::placeholder, #simpson38-n::placeholder {
+      color: #9CA3AF !important; /* Gris claro para el placeholder */
+    }
+    #virtual-keyboard {
+      z-index: 1000 !important; /* Asegura que el teclado esté por encima de todo */
+      min-width: 600px; /* Ancho mínimo para el teclado */
+    }
+    .kbd-btn {
+      min-width: 40px; /* Tamaño uniforme para los botones */
+      text-align: center;
+    }
+    #sidebar-title {
+      cursor: pointer; /* Indica que es clicable */
+    }
+    #sidebar-logo {
+      max-width: 200px; /* Tamaño  */
+      margin-top: 0.5rem; /* Espacio superior */
+      margin-left: auto; /* Centrado */
+      margin-right: auto; /* Centrado */
+      display: block; /* Centrado */
+    }
+  </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-64 bg-white dark:bg-gray-800 shadow-lg p-4">
+      <h1 id="sidebar-title" class="text-2xl font-bold mb-4 hover:text-blue-500 cursor-pointer">Métodos Numéricos</h1>
+      <img id="sidebar-logo" src="https://www.acatlan.unam.mx/identidad-acatlan/img/Logotipos/Logotipo/logo-blancoBis.jpg" alt="Logo FES Acatlán" class="mb-6">
+      <ul>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="fixed-point">Punto Fijo</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="newton">Newton</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="lagrange">Lagrange</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="divided-diff">Diferencias Divididas</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="least-squares">Mínimos Cuadrados</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="trapezoid">Trapecio</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="simpson-13">Simpson 1/3</button></li>
+        <li><button class="method-btn w-full text-left p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded" data-method="simpson-38">Simpson 3/8</button></li>
+      </ul>
+    </div>
+    <!-- Main Content -->
+    <div class="flex-1 p-6 overflow-auto">
+    <div id="method-content" class="max-w-4xl mx-auto">
+        <h2 id="method-title" class="text-3xl font-semibold mb-4"> Importancia de los Métodos Numéricos en la Resolución de Problemas Complejos </h2>
+    <div id="method-description" class="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded">
+        <p>
+            Los métodos numéricos son herramientas fundamentales en matemáticas aplicadas que permiten obtener soluciones aproximadas a problemas que, por su naturaleza, no pueden resolverse de manera exacta o simbólica. Estas técnicas son esenciales cuando se trabaja con modelos complejos en los que los métodos analíticos tradicionales no son viables.
+        </p>
+        <h3 class="text-xl font-semibold mt-4 mb-2">Ámbitos de Aplicación de los Métodos Numéricos</h3>
+            <ul class="list-disc list-inside space-y-1">
+                <li>
+                    <strong>Ingeniería y física:</strong> Para simular y analizar sistemas dinámicos, como el comportamiento de estructuras, el flujo de calor o de fluidos, y procesos termodinámicos.
+                </li>
+                <li>
+                    <strong>Optimización de recursos:</strong> En la economía, logística y administración, se emplean para encontrar soluciones eficientes que maximicen o minimicen ciertos objetivos bajo restricciones.
+                </li>
+                <li>
+                    <strong>Modelado científico:</strong> En disciplinas como la biología o la química, permiten resolver ecuaciones diferenciales, sistemas no lineales y otros modelos matemáticos que describen fenómenos reales.
+                </li>
+            </ul>
+
+        <h3 class="text-xl font-semibold mt-4 mb-2">Reflexión Final</h3>
+        <p>
+            En un mundo cada vez más dependiente del análisis computacional, los métodos numéricos se han vuelto indispensables para abordar desafíos científicos y tecnológicos. Elegir el método adecuado implica considerar la naturaleza del problema, el nivel de precisión necesario y la capacidad de cómputo disponible.
+        </p>
+        </div>
+        <div id="method-input" class="mb-6"></div>
+        <div id="method-result" class="mb-6"></div>
+        <div id="method-steps" class="mb-6 hidden bg-gray-50 dark:bg-gray-800 p-4 rounded"></div>
+        <button id="toggle-steps" class="mb-4 bg-green-500 text-white p-2 rounded hover:bg-green-600 hidden">Mostrar Pasos</button>
+      </div>
+      <!-- Virtual Keyboard -->
+      <div id="virtual-keyboard" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 hidden">
+        <div class="grid grid-cols-8 gap-2">
+          <!-- Numbers -->
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="7">7</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="8">8</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="9">9</button>
+          <!-- Operators -->
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="/">÷</button>
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="*">×</button>
+          <!-- Functions -->
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.sin(">sin</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.cos(">cos</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.tan(">tan</button>
+          <!-- Numbers -->
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="4">4</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="5">5</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="6">6</button>
+          <!-- Operators -->
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="-">-</button>
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="+">+</button>
+          <!-- Functions -->
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.asin(">arcsin</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.acos(">arccos</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.atan(">arctan</button>
+          <!-- Numbers -->
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="1">1</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="2">2</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="3">3</button>
+          <!-- Operators -->
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="^">^</button>
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="(">(</button>
+          <!-- Functions -->
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.sinh(">sinh</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.cosh(">cosh</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.tanh(">tanh</button>
+          <!-- Numbers -->
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="0">0</button>
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value=".">.</button>
+          <!-- Operators -->
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value=")">)</button>
+          <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="(/)">/</button>
+          <!-- Functions -->
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.sqrt(">√</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.log(">ln</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.log10(">log₁₀</button>
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.exp(">e^</button>
+          <!-- Variables -->
+          <button class="kbd-btn bg-green-500 text-white p-2 rounded hover:bg-green-600" data-value="x">x</button>
+          <button class="kbd-btn bg-green-500 text-white p-2 rounded hover:bg-green-600" data-value="y">y</button>
+          <button class="kbd-btn bg-green-500 text-white p-2 rounded hover:bg-green-600" data-value="z">z</button>
+          <!-- Constants -->
+          <button class="kbd-btn bg-purple-500 text-white p-2 rounded hover:bg-purple-600" data-value="Math.PI">π</button>
+          <button class="kbd-btn bg-purple-500 text-white p-2 rounded hover:bg-purple-600" data-value="Math.E">e</button>
+          <!-- Controls -->
+          <button class="kbd-btn bg-red-500 text-white p-2 rounded hover:bg-red-600" data-value="clear">C</button>
+          <button class="kbd-btn bg-green-600 text-white p-2 rounded hover:bg-green-700" data-value="ok">OK</button>
+          <!-- Additional Functions -->
+          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.pow(">x^y</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Factorial function for numerical methods
+    function factorial(n) {
+      if (n < 0) return NaN;
+      if (n === 0 || n === 1) return 1;
+      return n * factorial(n - 1);
+    }
+
+    // Lagrange interpolation function
+    function lagrangeInterpolate(x, points) {
+      let result = 0;
+      for (let i = 0; i < points.length; i++) {
+        let term = points[i].y;
+        for (let j = 0; j < points.length; j++) {
+          if (j !== i) {
+            term *= (x - points[j].x) / (points[i].x - points[j].x);
+          }
+        }
+        result += term;
+      }
+      return result;
+    }
+
+    // Divided Differences interpolation function
+    function dividedDiffInterpolate(x, points) {
+      const n = points.length;
+      const coeffs = computeDividedDifferences(points);
+      let result = coeffs[0];
+      let term = 1;
+      for (let i = 1; i < n; i++) {
+        term *= (x - points[i - 1].x);
+        result += coeffs[i] * term;
+      }
+      return result;
+    }
+
+    // Compute Divided Differences coefficients
+    function computeDividedDifferences(points) {
+      const n = points.length;
+      const f = Array(n).fill().map(() => Array(n).fill(0));
+      // Initialize first column with y values
+      for (let i = 0; i < n; i++) {
+        f[i][0] = points[i].y;
+      }
+      // Compute divided differences
+      for (let j = 1; j < n; j++) {
+        for (let i = j; i < n; i++) {
+          f[i][j] = (f[i][j - 1] - f[i - 1][j - 1]) / (points[i].x - points[i - j].x);
+        }
+      }
+      // Return diagonal (coefficients)
+      return f.map((row, i) => row[i]);
+    }
+
+    // Least Squares regression function
+    function leastSquaresRegression(points) {
+      const n = points.length;
+      let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+      for (let pt of points) {
+        sumX += pt.x;
+        sumY += pt.y;
+        sumXY += pt.x * pt.y;
+        sumX2 += pt.x * pt.x;
+      }
+      const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+      const b = (sumY - m * sumX) / n;
+      return { m, b };
+    }
+
+    // Method descriptions and logic
+    const methods = {
+      'fixed-point': {
+        title: 'Método de Punto Fijo',
+        description: 'El método de punto fijo encuentra la raíz de una ecuación no lineal \\( f(x) = 0 \\) reescribiéndola como \\( x = g(x) \\) e iterando \\( x_{n+1} = g(x_n) \\) hasta que converge.',
+        input: `
+          <label class="block mb-2">Ecuación g(x)</label>
+          <input id="fp-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'Math.cos(x)' o 'x/2 + 1'">
+          <label class="block mb-2 mt-4">Valor inicial (x0)</label>
+          <input id="fp-initial" type="number" step="any" class="w-full p-2 border rounded" placeholder="0">
+          <label class="block mb-2 mt-4">Tolerancia</label>
+          <input id="fp-tolerance" type="number" step="any" class="w-full p-2 border rounded" value="0.0001">
+          <label class="block mb-2 mt-4">Máximo de iteraciones</label>
+          <input id="fp-max-iter" type="number" class="w-full p-2 border rounded" value="100">
+          <button id="fp-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const equation = document.getElementById('fp-equation').value;
+          const x0 = parseFloat(document.getElementById('fp-initial').value);
+          const tolerance = parseFloat(document.getElementById('fp-tolerance').value);
+          const maxIter = parseInt(document.getElementById('fp-max-iter').value);
+          let x = x0;
+          let steps = [];
+          let iterations = 0;
+          let converged = false;
+
+          try {
+            // Define factorial for use in eval
+            const fact = factorial;
+            const g = (x) => eval(equation); 
+            steps.push(`\\( x_0 = ${x0.toFixed(6)} \\)`);
+
+            while (iterations < maxIter) {
+              const xNext = g(x);
+              steps.push(`\\( x_${iterations + 1} = g(x_${iterations}) = g(${x.toFixed(6)}) = ${xNext.toFixed(6)} \\)`);
+              if (Math.abs(xNext - x) < tolerance) {
+                converged = true;
+                break;
+              }
+              x = xNext;
+              iterations++;
+            }
+
+            let result = converged
+              ? `Raíz aproximada: \\( x = ${x.toFixed(6)} \\) (iteraciones: ${iterations})`
+              : `No convergió en ${maxIter} iteraciones. Último valor: \\( x = ${x.toFixed(6)} \\)`;
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">$${result}$</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: Ecuación inválida o parámetros incorrectos.</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'newton': {
+        title: 'Método de Newton',
+        description: 'El método de Newton encuentra la raíz de una ecuación no lineal \\( f(x) = 0 \\) iterando \\( x_{n+1} = x_n - \\frac{f(x_n)}{f\'(x_n)} \\), donde \\( f\'(x) \\) es la derivada de \\( f(x) \\). Requiere una adivinanza inicial y converge rápidamente si la inicial es buena.',
+        input: `
+          <label class="block mb-2">Ecuación f(x)</label>
+          <input id="newton-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x - 2' o 'Math.sin(x) - x/3'">
+          <label class="block mb-2 mt-4">Derivada f'(x)</label>
+          <input id="newton-derivative" type="text" class="w-full p-2 border rounded" placeholder="ej. '2*x' o 'Math.cos(x) - 1/3'">
+          <label class="block mb-2 mt-4">Valor inicial (x0)</label>
+          <input id="newton-initial" type="number" step="any" class="w-full p-2 border rounded" placeholder="0">
+          <label class="block mb-2 mt-4">Tolerancia</label>
+          <input id="newton-tolerance" type="number" step="any" class="w-full p-2 border rounded" value="0.0001">
+          <label class="block mb-2 mt-4">Máximo de iteraciones</label>
+          <input id="newton-max-iter" type="number" class="w-full p-2 border rounded" value="100">
+          <button id="newton-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const equation = document.getElementById('newton-equation').value;
+          const derivative = document.getElementById('newton-derivative').value;
+          const x0 = parseFloat(document.getElementById('newton-initial').value);
+          const tolerance = parseFloat(document.getElementById('newton-tolerance').value);
+          const maxIter = parseInt(document.getElementById('newton-max-iter').value);
+          let x = x0;
+          let steps = [];
+          let iterations = 0;
+          let converged = false;
+
+          try {
+            // Define factorial for use in eval
+            const fact = factorial;
+            const f = (x) => eval(equation); 
+            const fPrime = (x) => eval(derivative);
+            steps.push(`\\( x_0 = ${x0.toFixed(6)} \\)`);
+
+            while (iterations < maxIter) {
+              const fx = f(x);
+              const fpx = fPrime(x);
+              if (Math.abs(fpx) < 1e-10) {
+                throw new Error('Derivada cercana a cero, método falla.');
+              }
+              const xNext = x - fx / fpx;
+              steps.push(`\\( x_${iterations + 1} = x_${iterations} - \\frac{f(x_${iterations})}{f\'(x_${iterations})} = ${x.toFixed(6)} - \\frac{${fx.toFixed(6)}}{${fpx.toFixed(6)}} = ${xNext.toFixed(6)} \\)`);
+              if (Math.abs(xNext - x) < tolerance || Math.abs(fx) < tolerance) {
+                converged = true;
+                break;
+              }
+              x = xNext;
+              iterations++;
+            }
+
+            let result = converged
+              ? `Raíz aproximada: \\( x = ${x.toFixed(6)} \\) (iteraciones: ${iterations})`
+              : `No convergió en ${maxIter} iteraciones. Último valor: \\( x = ${x.toFixed(6)} \\)`;
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">$${result}$</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'lagrange': {
+        title: 'Método de Interpolación de Lagrange',
+        description: 'El método de interpolación de Lagrange construye un polinomio que pasa exactamente por un conjunto de puntos \\( (x_i, y_i) \\). El polinomio se define como \\( P(x) = \\sum_{i=0}^n y_i \\ell_i(x) \\), donde \\( \\ell_i(x) = \\prod_{j \\neq i} \\frac{x - x_j}{x_i - x_j} \\).',
+        input: `
+          <label class="block mb-2">Puntos (x,y) separados por comas</label>
+          <input id="lagrange-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,2, 2,4'">
+          <label class="block mb-2 mt-4">Valor x para interpolar</label>
+          <input id="lagrange-x" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1.5">
+          <button id="lagrange-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const pointsInput = document.getElementById('lagrange-points').value;
+          const xInterp = parseFloat(document.getElementById('lagrange-x').value);
+          let steps = [];
+
+          try {
+            // Parse points input
+            const pointsArray = pointsInput.split(',').map(s => s.trim());
+            if (pointsArray.length % 2 !== 0) {
+              throw new Error('Los puntos deben ingresarse como pares (x,y).');
+            }
+            const lagrangePoints = [];
+            for (let i = 0; i < pointsArray.length; i += 2) {
+              const x = parseFloat(pointsArray[i]);
+              const y = parseFloat(pointsArray[i + 1]);
+              if (isNaN(x) || isNaN(y)) {
+                throw new Error('Puntos inválidos. Use números válidos.');
+              }
+              lagrangePoints.push({ x, y });
+            }
+
+            // Check for duplicate x values
+            const xValues = lagrangePoints.map(pt => pt.x);
+            if (new Set(xValues).size !== xValues.length) {
+              throw new Error('Los valores de x deben ser únicos.');
+            }
+
+            // Calculate Lagrange polynomial
+            let polynomial = '';
+            for (let i = 0; i < lagrangePoints.length; i++) {
+              let term = lagrangePoints[i].y.toFixed(6);
+              let denominator = '';
+              let denomValue = 1;
+              for (let j = 0; j < lagrangePoints.length; j++) {
+                if (j !== i) {
+                  term += ` \\cdot \\frac{x - ${lagrangePoints[j].x.toFixed(6)}}{${lagrangePoints[i].x.toFixed(6)} - ${lagrangePoints[j].x.toFixed(6)}}`;
+                  denomValue *= (lagrangePoints[i].x - lagrangePoints[j].x);
+                }
+              }
+              denominator += `\\ell_${i}(x) = ${term}`;
+              steps.push(`\\(${denominator}\\)`);
+              polynomial += (lagrangePoints[i].y >= 0 ? ' + ' : ' - ') + `(${Math.abs(lagrangePoints[i].y).toFixed(6)}) \\cdot \\ell_${i}(x)`;
+            }
+            steps.unshift(`\\( P(x) = ${polynomial}\\)`);
+
+            // Evaluate at xInterp
+            let result = lagrangeInterpolate(xInterp, lagrangePoints);
+            steps.push(`\\( P(${xInterp.toFixed(6)}) = ${result.toFixed(6)} \\)`);
+
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">Valor interpolado en \\( x = ${xInterp.toFixed(6)} \\): \\( P(x) = ${result.toFixed(6)} \\)</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Entrada inválida.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'divided-diff': {
+        title: 'Método de Diferencias Divididas',
+        description: 'El método de diferencias divididas construye un polinomio de interpolación de Newton para un conjunto de puntos \\( (x_i, y_i) \\). El polinomio se expresa como \\( P(x) = f[x_0] + f[x_0,x_1](x-x_0) + \\cdots + f[x_0,\\ldots,x_n](x-x_0)\\cdots(x-x_{n-1}) \\), donde \\( f[x_i,\\ldots,x_j] \\) son las diferencias divididas.',
+        input: `
+          <label class="block mb-2">Puntos (x,y) separados por comas</label>
+          <input id="divided-diff-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,2, 2,4'">
+          <label class="block mb-2 mt-4">Valor x para interpolar</label>
+          <input id="divided-diff-x" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1.5">
+          <button id="divided-diff-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const pointsInput = document.getElementById('divided-diff-points').value;
+          const xInterp = parseFloat(document.getElementById('divided-diff-x').value);
+          let steps = [];
+
+          try {
+            // Parse points input
+            const pointsArray = pointsInput.split(',').map(s => s.trim());
+            if (pointsArray.length % 2 !== 0) {
+              throw new Error('Los puntos deben ingresarse como pares (x,y).');
+            }
+            const dividedDiffPoints = [];
+            for (let i = 0; i < pointsArray.length; i += 2) {
+              const x = parseFloat(pointsArray[i]);
+              const y = parseFloat(pointsArray[i + 1]);
+              if (isNaN(x) || isNaN(y)) {
+                throw new Error('Puntos inválidos. Use números válidos.');
+              }
+              dividedDiffPoints.push({ x, y });
+            }
+
+            // Check for duplicate x values
+            const xValues = dividedDiffPoints.map(pt => pt.x);
+            if (new Set(xValues).size !== xValues.length) {
+              throw new Error('Los valores de x deben ser únicos.');
+            }
+
+            // Compute divided differences
+            const n = dividedDiffPoints.length;
+            const f = Array(n).fill().map(() => Array(n).fill(0));
+            for (let i = 0; i < n; i++) {
+              f[i][0] = dividedDiffPoints[i].y;
+              steps.push(`\\( f[x_${i}] = ${f[i][0].toFixed(6)} \\)`);
+            }
+            for (let j = 1; j < n; j++) {
+              for (let i = j; i < n; i++) {
+                f[i][j] = (f[i][j - 1] - f[i - 1][j - 1]) / (dividedDiffPoints[i].x - dividedDiffPoints[i - j].x);
+                steps.push(`\\( f[x_${i-j},\\ldots,x_${i}] = \\frac{f[x_${i-j+1},\\ldots,x_${i}] - f[x_${i-j},\\ldots,x_${i-1}]}{x_${i} - x_${i-j}} = \\frac{${f[i][j - 1].toFixed(6)} - ${f[i - 1][j - 1].toFixed(6)}}{${dividedDiffPoints[i].x.toFixed(6)} - ${dividedDiffPoints[i - j].x.toFixed(6)}} = ${f[i][j].toFixed(6)} \\)`);
+              }
+            }
+
+            // Construct polynomial
+            let polynomial = `\\( P(x) = ${f[0][0].toFixed(6)}`;
+            let term = 1;
+            for (let i = 1; i < n; i++) {
+              term *= `(x - ${dividedDiffPoints[i - 1].x.toFixed(6)})`;
+              polynomial += ` + ${f[i][i].toFixed(6)} \\cdot ${term}`;
+            }
+            polynomial += ` \\)`;
+            steps.unshift(polynomial);
+
+            // Evaluate at xInterp
+            let result = dividedDiffInterpolate(xInterp, dividedDiffPoints);
+            steps.push(`\\( P(${xInterp.toFixed(6)}) = ${result.toFixed(6)} \\)`);
+
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">Valor interpolado en \\( x = ${xInterp.toFixed(6)} \\): \\( P(x) = ${result.toFixed(6)} \\)</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Entrada inválida.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'least-squares': {
+        title: 'Método de Mínimos Cuadrados',
+        description: 'El método de mínimos cuadrados encuentra la recta de mejor ajuste \\( y = mx + b \\) que minimiza la suma de los cuadrados de los errores para un conjunto de puntos \\( (x_i, y_i) \\). Los coeficientes se calculan como \\( m = \\frac{n \\sum x_i y_i - \\sum x_i \\sum y_i}{n \\sum x_i^2 - (\\sum x_i)^2} \\), \\( b = \\frac{\\sum y_i - m \\sum x_i}{n} \\).',
+        input: `
+          <label class="block mb-2">Puntos (x,y) separados por comas</label>
+          <input id="ls-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,1.2, 2,2.1, 3,3.3'">
+          <button id="ls-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const pointsInput = document.getElementById('ls-points').value;
+          let steps = [];
+
+          try {
+            // Parse points input
+            const pointsArray = pointsInput.split(',').map(s => s.trim());
+            if (pointsArray.length % 2 !== 0) {
+              throw new Error('Los puntos deben ingresarse como pares (x,y).');
+            }
+            const lsPoints = [];
+            for (let i = 0; i < pointsArray.length; i += 2) {
+              const x = parseFloat(pointsArray[i]);
+              const y = parseFloat(pointsArray[i + 1]);
+              if (isNaN(x) || isNaN(y)) {
+                throw new Error('Puntos inválidos. Use números válidos.');
+              }
+              lsPoints.push({ x, y });
+            }
+
+            if (lsPoints.length < 2) {
+              throw new Error('Se requieren al menos dos puntos para la regresión.');
+            }
+
+            // Calculate least squares
+            const n = lsPoints.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            for (let pt of lsPoints) {
+              sumX += pt.x;
+              sumY += pt.y;
+              sumXY += pt.x * pt.y;
+              sumX2 += pt.x * pt.x;
+            }
+            const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const b = (sumY - m * sumX) / n;
+
+            steps.push(`\\( n = ${n} \\)`);
+            steps.push(`\\( \\sum x_i = ${sumX.toFixed(6)} \\)`);
+            steps.push(`\\( \\sum y_i = ${sumY.toFixed(6)} \\)`);
+            steps.push(`\\( \\sum x_i y_i = ${sumXY.toFixed(6)} \\)`);
+            steps.push(`\\( \\sum x_i^2 = ${sumX2.toFixed(6)} \\)`);
+            steps.push(`\\( m = \\frac{n \\sum x_i y_i - \\sum x_i \\sum y_i}{n \\sum x_i^2 - (\\sum x_i)^2} = \\frac{${n} \\cdot ${sumXY.toFixed(6)} - ${sumX.toFixed(6)} \\cdot ${sumY.toFixed(6)}}{${n} \\cdot ${sumX2.toFixed(6)} - (${sumX.toFixed(6)})^2} = ${m.toFixed(6)} \\)`);
+            steps.push(`\\( b = \\frac{\\sum y_i - m \\sum x_i}{n} = \\frac{${sumY.toFixed(6)} - ${m.toFixed(6)} \\cdot ${sumX.toFixed(6)}}{${n}} = ${b.toFixed(6)} \\)`);
+            steps.push(`\\( y = ${m.toFixed(6)}x + ${b.toFixed(6)} \\)`);
+
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">Recta de regresión: \\( y = ${m.toFixed(6)}x + ${b.toFixed(6)} \\)</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Entrada inválida.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'trapezoid': {
+        title: 'Regla del Trapecio',
+        description: 'La regla del trapecio aproxima la integral definida \\( \\int_a^b f(x) \\, dx \\) dividiendo el intervalo \\([a, b]\\) en \\( n \\) subintervalos de ancho \\( h = \\frac{b-a}{n} \\). La fórmula es \\( \\int_a^b f(x) \\, dx \\approx \\frac{h}{2} \\left[ f(x_0) + 2 \\sum_{i=1}^{n-1} f(x_i) + f(x_n) \\right] \\), donde \\( x_i = a + i h \\).',
+        input: `
+          <label class="block mb-2">Función f(x)</label>
+          <input id="trapezoid-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'">
+          <label class="block mb-2 mt-4">Límite inferior (a)</label>
+          <input id="trapezoid-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0">
+          <label class="block mb-2 mt-4">Límite superior (b)</label>
+          <input id="trapezoid-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1">
+          <label class="block mb-2 mt-4">Número de subintervalos (n)</label>
+          <input id="trapezoid-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 4">
+          <button id="trapezoid-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const equation = document.getElementById('trapezoid-equation').value;
+          const a = parseFloat(document.getElementById('trapezoid-a').value);
+          const b = parseFloat(document.getElementById('trapezoid-b').value);
+          const n = parseInt(document.getElementById('trapezoid-n').value);
+          let steps = [];
+
+          try {
+            // Validate inputs
+            if (isNaN(a) || isNaN(b) || isNaN(n)) {
+              throw new Error('Todos los parámetros deben ser números válidos.');
+            }
+            if (a >= b) {
+              throw new Error('El límite inferior (a) debe ser menor que el límite superior (b).');
+            }
+            if (n <= 0) {
+              throw new Error('El número de subintervalos (n) debe ser mayor que 0.');
+            }
+
+            // Define factorial for use in eval
+            const fact = factorial;
+            const f = (x) => eval(equation); 
+
+            // Calculate h
+            const h = (b - a) / n;
+            steps.push(`\\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
+
+            // Calculate points and function values
+            let sum = 0;
+            for (let i = 0; i <= n; i++) {
+              const x = a + i * h;
+              const y = f(x);
+              steps.push(`\\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
+              steps.push(`\\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              if (i === 0 || i === n) {
+                sum += y;
+              } else {
+                sum += 2 * y;
+              }
+            }
+
+            // Calculate integral
+            const integral = (h / 2) * sum;
+            steps.push(`\\( \\sum f(x_i) = f(x_0) + 2 \\sum_{i=1}^{${n-1}} f(x_i) + f(x_n) = ${sum.toFixed(6)} \\)`);
+            steps.push(`\\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{h}{2} \\cdot \\sum f(x_i) = \\frac{${h.toFixed(6)}}{2} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
+
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">Integral aproximada: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx ${integral.toFixed(6)} \\)</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'simpson-13': {
+        title: 'Regla de Simpson 1/3',
+        description: 'La regla de Simpson 1/3 aproxima la integral definida \\( \\int_a^b f(x) \\, dx \\) dividiendo el intervalo \\([a, b]\\) en \\( n \\) subintervalos (\\( n \\) par) de ancho \\( h = \\frac{b-a}{n} \\). La fórmula es \\( \\int_a^b f(x) \\, dx \\approx \\frac{h}{3} \\left[ f(x_0) + 4 \\sum_{i=1,3,\\ldots}^{n-1} f(x_i) + 2 \\sum_{i=2,4,\\ldots}^{n-2} f(x_i) + f(x_n) \\right] \\), donde \\( x_i = a + i h \\).',
+        input: `
+          <label class="block mb-2">Función f(x)</label>
+          <input id="simpson13-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'">
+          <label class="block mb-2 mt-4">Límite inferior (a)</label>
+          <input id="simpson13-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0">
+          <label class="block mb-2 mt-4">Límite superior (b)</label>
+          <input id="simpson13-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1">
+          <label class="block mb-2 mt-4">Número de subintervalos (n, debe ser par)</label>
+          <input id="simpson13-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 4">
+          <button id="simpson13-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const equation = document.getElementById('simpson13-equation').value;
+          const a = parseFloat(document.getElementById('simpson13-a').value);
+          const b = parseFloat(document.getElementById('simpson13-b').value);
+          const n = parseInt(document.getElementById('simpson13-n').value);
+          let steps = [];
+
+          try {
+            // Validate inputs
+            if (isNaN(a) || isNaN(b) || isNaN(n)) {
+              throw new Error('Todos los parámetros deben ser números válidos.');
+            }
+            if (a >= b) {
+              throw new Error('El límite inferior (a) debe ser menor que el límite superior (b).');
+            }
+            if (n <= 0) {
+              throw new Error('El número de subintervalos (n) debe ser mayor que 0.');
+            }
+            if (n % 2 !== 0) {
+              throw new Error('El número de subintervalos (n) debe ser par.');
+            }
+
+            // Define factorial for use in eval
+            const fact = factorial;
+            const f = (x) => eval(equation); 
+
+            // Calculate h
+            const h = (b - a) / n;
+            steps.push(`\\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
+
+            // Calculate points and function values
+            let sum = 0;
+            const points = [];
+            for (let i = 0; i <= n; i++) {
+              const x = a + i * h;
+              const y = f(x);
+              points.push({ x, y });
+              steps.push(`\\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
+              steps.push(`\\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              if (i === 0 || i === n) {
+                sum += y;
+              } else if (i % 2 === 1) {
+                sum += 4 * y;
+              } else {
+                sum += 2 * y;
+              }
+            }
+
+            // Calculate integral
+            const integral = (h / 3) * sum;
+            steps.push(`\\( \\sum f(x_i) = f(x_0) + 4 \\sum_{i=1,3,\\ldots}^{${n-1}} f(x_i) + 2 \\sum_{i=2,4,\\ldots}^{${n-2}} f(x_i) + f(x_n) = ${points[0].y.toFixed(6)} + 4 \\cdot (${points.filter((_, i) => i % 2 === 1 && i !== n).map(pt => pt.y.toFixed(6)).join(' + ')}) + 2 \\cdot (${points.filter((_, i) => i % 2 === 0 && i !== 0 && i !== n).map(pt => pt.y.toFixed(6)).join(' + ')}) + ${points[n].y.toFixed(6)} = ${sum.toFixed(6)} \\)`);
+            steps.push(`\\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{h}{3} \\cdot \\sum f(x_i) = \\frac{${h.toFixed(6)}}{3} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
+
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">Integral aproximada: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx ${integral.toFixed(6)} \\)</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      },
+      'simpson-38': {
+        title: 'Regla de Simpson 3/8',
+        description: 'La regla de Simpson 3/8 aproxima la integral definida \\( \\int_a^b f(x) \\, dx \\) dividiendo el intervalo \\([a, b]\\) en \\( n \\) subintervalos (\\( n \\) múltiplo de 3) de ancho \\( h = \\frac{b-a}{n} \\). La fórmula es \\( \\int_a^b f(x) \\, dx \\approx \\frac{3h}{8} \\left[ f(x_0) + 3 \\sum_{i=1,2,4,5,\\ldots}^{n-1} f(x_i) + 2 \\sum_{i=3,6,\\ldots}^{n-3} f(x_i) + f(x_n) \\right] \\), donde \\( x_i = a + i h \\).',
+        input: `
+          <label class="block mb-2">Función f(x)</label>
+          <input id="simpson38-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'">
+          <label class="block mb-2 mt-4">Límite inferior (a)</label>
+          <input id="simpson38-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0">
+          <label class="block mb-2 mt-4">Límite superior (b)</label>
+          <input id="simpson38-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1">
+          <label class="block mb-2 mt-4">Número de subintervalos (n, debe ser múltiplo de 3)</label>
+          <input id="simpson38-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 3">
+          <button id="simpson38-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
+        `,
+        calculate: function() {
+          const equation = document.getElementById('simpson38-equation').value;
+          const a = parseFloat(document.getElementById('simpson38-a').value);
+          const b = parseFloat(document.getElementById('simpson38-b').value);
+          const n = parseInt(document.getElementById('simpson38-n').value);
+          let steps = [];
+
+          try {
+            // Validate inputs
+            if (isNaN(a) || isNaN(b) || isNaN(n)) {
+              throw new Error('Todos los parámetros deben ser números válidos.');
+            }
+            if (a >= b) {
+              throw new Error('El límite inferior (a) debe ser menor que el límite superior (b).');
+            }
+            if (n <= 0) {
+              throw new Error('El número de subintervalos (n) debe ser mayor que 0.');
+            }
+            if (n % 3 !== 0) {
+              throw new Error('El número de subintervalos (n) debe ser múltiplo de 3.');
+            }
+
+            // Define factorial for use in eval
+            const fact = factorial;
+            const f = (x) => eval(equation); 
+
+            // Calculate h
+            const h = (b - a) / n;
+            steps.push(`\\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
+
+            // Calculate points and function values
+            let sum = 0;
+            const points = [];
+            for (let i = 0; i <= n; i++) {
+              const x = a + i * h;
+              const y = f(x);
+              points.push({ x, y });
+              steps.push(`\\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
+              steps.push(`\\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              if (i === 0 || i === n) {
+                sum += y;
+              } else if (i % 3 === 0) {
+                sum += 2 * y;
+              } else {
+                sum += 3 * y;
+              }
+            }
+
+            // Calculate integral
+            const integral = (3 * h / 8) * sum;
+            const threeTerms = points.filter((_, i) => i !== 0 && i !== n && i % 3 !== 0).map(pt => pt.y.toFixed(6)).join(' + ');
+            const twoTerms = points.filter((_, i) => i !== 0 && i !== n && i % 3 === 0).map(pt => pt.y.toFixed(6)).join(' + ');
+            steps.push(`\\( \\sum f(x_i) = f(x_0) + 3 \\sum_{i=1,2,4,5,\\ldots}^{${n-1}} f(x_i) + 2 \\sum_{i=3,6,\\ldots}^{${n-3}} f(x_i) + f(x_n) = ${points[0].y.toFixed(6)} + 3 \\cdot (${threeTerms || '0'}) + 2 \\cdot (${twoTerms || '0'}) + ${points[n].y.toFixed(6)} = ${sum.toFixed(6)} \\)`);
+            steps.push(`\\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{3h}{8} \\cdot \\sum f(x_i) = \\frac{3 \\cdot ${h.toFixed(6)}}{8} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
+
+            document.getElementById('method-result').innerHTML = `<p class="text-lg">Integral aproximada: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx ${integral.toFixed(6)} \\)</p>`;
+            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
+            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('toggle-steps').classList.remove('hidden');
+            MathJax.typeset(); // Render LaTeX
+          } catch (e) {
+            document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
+            document.getElementById('method-steps').classList.add('hidden');
+            document.getElementById('toggle-steps').classList.add('hidden');
+          }
+        }
+      }
+    };
+
+    // Event listeners for method buttons
+    document.querySelectorAll('.method-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const method = btn.dataset.method;
+        const data = methods[method];
+        document.getElementById('method-title').textContent = data.title;
+        document.getElementById('method-description').innerHTML = `<p>${data.description}</p>`;
+        document.getElementById('method-input').innerHTML = data.input;
+        document.getElementById('method-result').innerHTML = '';
+        document.getElementById('method-steps').innerHTML = '';
+        document.getElementById('method-steps').classList.add('hidden');
+        document.getElementById('toggle-steps').classList.add('hidden');
+        MathJax.typeset();
+        if (method === 'fixed-point') {
+          const calculateBtn = document.getElementById('fp-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const equationInput = document.getElementById('fp-equation');
+          if (equationInput) {
+            equationInput.addEventListener('focus', showVirtualKeyboard);
+            equationInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'newton') {
+          const calculateBtn = document.getElementById('newton-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const equationInput = document.getElementById('newton-equation');
+          const derivativeInput = document.getElementById('newton-derivative');
+          if (equationInput) {
+            equationInput.addEventListener('focus', showVirtualKeyboard);
+            equationInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (derivativeInput) {
+            derivativeInput.addEventListener('focus', showVirtualKeyboard);
+            derivativeInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'lagrange') {
+          const calculateBtn = document.getElementById('lagrange-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const pointsInput = document.getElementById('lagrange-points');
+          const xInput = document.getElementById('lagrange-x');
+          if (pointsInput) {
+            pointsInput.addEventListener('focus', showVirtualKeyboard);
+            pointsInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (xInput) {
+            xInput.addEventListener('focus', showVirtualKeyboard);
+            xInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'divided-diff') {
+          const calculateBtn = document.getElementById('divided-diff-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const pointsInput = document.getElementById('divided-diff-points');
+          const xInput = document.getElementById('divided-diff-x');
+          if (pointsInput) {
+            pointsInput.addEventListener('focus', showVirtualKeyboard);
+            pointsInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (xInput) {
+            xInput.addEventListener('focus', showVirtualKeyboard);
+            xInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'least-squares') {
+          const calculateBtn = document.getElementById('ls-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const pointsInput = document.getElementById('ls-points');
+          if (pointsInput) {
+            pointsInput.addEventListener('focus', showVirtualKeyboard);
+            pointsInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'trapezoid') {
+          const calculateBtn = document.getElementById('trapezoid-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const equationInput = document.getElementById('trapezoid-equation');
+          const aInput = document.getElementById('trapezoid-a');
+          const bInput = document.getElementById('trapezoid-b');
+          const nInput = document.getElementById('trapezoid-n');
+          if (equationInput) {
+            equationInput.addEventListener('focus', showVirtualKeyboard);
+            equationInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (aInput) {
+            aInput.addEventListener('focus', showVirtualKeyboard);
+            aInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (bInput) {
+            bInput.addEventListener('focus', showVirtualKeyboard);
+            bInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (nInput) {
+            nInput.addEventListener('focus', showVirtualKeyboard);
+            nInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'simpson-13') {
+          const calculateBtn = document.getElementById('simpson13-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const equationInput = document.getElementById('simpson13-equation');
+          const aInput = document.getElementById('simpson13-a');
+          const bInput = document.getElementById('simpson13-b');
+          const nInput = document.getElementById('simpson13-n');
+          if (equationInput) {
+            equationInput.addEventListener('focus', showVirtualKeyboard);
+            equationInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (aInput) {
+            aInput.addEventListener('focus', showVirtualKeyboard);
+            aInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (bInput) {
+            bInput.addEventListener('focus', showVirtualKeyboard);
+            bInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (nInput) {
+            nInput.addEventListener('focus', showVirtualKeyboard);
+            nInput.addEventListener('click', showVirtualKeyboard);
+          }
+        } else if (method === 'simpson-38') {
+          const calculateBtn = document.getElementById('simpson38-calculate');
+          if (calculateBtn) {
+            calculateBtn.addEventListener('click', data.calculate);
+          }
+          const equationInput = document.getElementById('simpson38-equation');
+          const aInput = document.getElementById('simpson38-a');
+          const bInput = document.getElementById('simpson38-b');
+          const nInput = document.getElementById('simpson38-n');
+          if (equationInput) {
+            equationInput.addEventListener('focus', showVirtualKeyboard);
+            equationInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (aInput) {
+            aInput.addEventListener('focus', showVirtualKeyboard);
+            aInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (bInput) {
+            bInput.addEventListener('focus', showVirtualKeyboard);
+            bInput.addEventListener('click', showVirtualKeyboard);
+          }
+          if (nInput) {
+            nInput.addEventListener('focus', showVirtualKeyboard);
+            nInput.addEventListener('click', showVirtualKeyboard);
+          }
+        }
+      });
+    });
+
+    // Reset to initial state when clicking the title
+    document.getElementById('sidebar-title').addEventListener('click', () => {
+    document.getElementById('method-title').textContent = 'Importancia de los Métodos Numéricos en la Resolución de Problemas Complejos';
+    document.getElementById('method-description').innerHTML = `
+      <p>Los métodos numéricos son herramientas fundamentales en matemáticas aplicadas que permiten obtener soluciones aproximadas a problemas que, por su naturaleza, no pueden resolverse de manera exacta o simbólica. Estas técnicas son esenciales cuando se trabaja con modelos complejos en los que los métodos analíticos tradicionales no son viables.</p>
+      <h3 class="text-xl font-semibold mt-4 mb-2">Ámbitos de Aplicación de los Métodos Numéricos</h3>
+      <ul class="list-disc list-inside space-y-1">
+        <li><strong>Ingeniería y física:</strong> Para simular y analizar sistemas dinámicos, como el comportamiento de estructuras, el flujo de calor o de fluidos, y procesos termodinámicos.</li>
+        <li><strong>Optimización de recursos:</strong> En la economía, logística y administración, se emplean para encontrar soluciones eficientes que maximicen o minimicen ciertos objetivos bajo restricciones.</li>
+        <li><strong>Modelado científico:</strong> En disciplinas como la biología o la química, permiten resolver ecuaciones diferenciales, sistemas no lineales y otros modelos matemáticos que describen fenómenos reales.</li>
+      </ul>
+      <h3 class="text-xl font-semibold mt-4 mb-2">Reflexión Final</h3>
+      <p>En un mundo cada vez más dependiente del análisis computacional, los métodos numéricos se han vuelto indispensables para abordar desafíos científicos y tecnológicos. Elegir el método adecuado implica considerar la naturaleza del problema, el nivel de precisión necesario y la capacidad de cómputo disponible.</p>
+    `;
+    document.getElementById('method-input').innerHTML = '';
+    document.getElementById('method-result').innerHTML = '';
+    document.getElementById('method-steps').innerHTML = '';
+    document.getElementById('method-steps').classList.add('hidden');
+    document.getElementById('toggle-steps').classList.add('hidden');
+    MathJax.typeset();
+    });
+
+    // Toggle steps visibility
+    document.getElementById('toggle-steps').addEventListener('click', () => {
+      const stepsDiv = document.getElementById('method-steps');
+      stepsDiv.classList.toggle('hidden');
+      document.getElementById('toggle-steps').textContent = stepsDiv.classList.contains('hidden') ? 'Mostrar Pasos' : 'Ocultar Pasos';
+    });
+
+    // Virtual Keyboard Logic
+    let activeInput = null;
+
+    function showVirtualKeyboard(event) {
+      activeInput = event.target;
+      const keyboard = document.getElementById('virtual-keyboard');
+      if (keyboard) {
+        keyboard.classList.remove('hidden');
+      }
+      // Add event listeners to keyboard buttons
+      document.querySelectorAll('.kbd-btn').forEach(btn => {
+        btn.removeEventListener('click', handleKeyboardClick); // Prevent multiple listeners
+        btn.addEventListener('click', handleKeyboardClick);
+      });
+    }
+
+    function handleKeyboardClick(event) {
+      const value = event.target.dataset.value;
+      if (!activeInput) return;
+
+      if (value === 'clear') {
+        activeInput.value = '';
+      } else if (value === 'ok') {
+        
+        let currentValue = activeInput.value;
+        const functionPrefixes = [
+          'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.asin(', 'Math.acos(', 'Math.atan(',
+          'Math.sinh(', 'Math.cosh(', 'Math.tanh(', 'Math.sqrt(', 'Math.log(', 'Math.log10(',
+          'Math.exp(', 'Math.pow('
+        ];
+        for (const prefix of functionPrefixes) {
+          if (currentValue.includes(prefix) && !currentValue.endsWith(')')) {
+            currentValue += ')';
+          }
+        }
+        activeInput.value = currentValue;
+        document.getElementById('virtual-keyboard').classList.add('hidden');
+        activeInput = null;
+      } else {
+        // Insert value at cursor position
+        const start = activeInput.selectionStart;
+        const end = activeInput.selectionEnd;
+        const textBefore = activeInput.value.substring(0, start);
+        const textAfter = activeInput.value.substring(end);
+        activeInput.value = textBefore + value + textAfter;
+        // Move cursor to end of inserted value
+        activeInput.selectionStart = activeInput.selectionEnd = start + value.length;
+      }
+      activeInput.focus();
+    }
+
+    // Hide keyboard when clicking outside
+    document.addEventListener('click', (event) => {
+      const keyboard = document.getElementById('virtual-keyboard');
+      if (keyboard && !keyboard.contains(event.target) && !event.target.matches('input')) {
+        keyboard.classList.add('hidden');
+        activeInput = null;
+      }
+    });
+  </script>
+</body>
+</html>

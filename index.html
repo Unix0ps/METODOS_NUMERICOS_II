@@ -88,6 +88,8 @@ input[type="number"] {
         <div id="method-result" class="mb-6"></div>
         <div id="method-steps" class="mb-6 hidden bg-gray-50 dark:bg-gray-800 p-4 rounded"></div>
         <button id="toggle-steps" class="mb-4 bg-green-500 text-white p-2 rounded hover:bg-green-600 hidden">Mostrar Pasos</button>
+        <div id="method-table" class="mb-6 hidden bg-gray-50 dark:bg-gray-800 p-4 rounded"></div>
+        <button id="toggle-table" class="mb-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600 hidden">Tabla</button>
       </div>
       <!-- Virtual Keyboard -->
       <div id="virtual-keyboard" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 hidden">
@@ -245,19 +247,22 @@ input[type="number"] {
           const maxIter = parseInt(document.getElementById('fp-max-iter').value);
           let x = x0;
           let steps = [];
+          let tableData = [];
           let iterations = 0;
           let converged = false;
 
           try {
-            // Define factorial for use in eval
             const fact = factorial;
             const g = (x) => eval(equation); 
-            steps.push(`\\( x_0 = ${x0.toFixed(6)} \\)`);
+            steps.push(`Paso 0: \\( x_0 = ${x0.toFixed(6)} \\)`);
+            tableData.push({ n: 0, xn: x0, gxn: null, error: null });
 
             while (iterations < maxIter) {
               const xNext = g(x);
-              steps.push(`\\( x_${iterations + 1} = g(x_${iterations}) = g(${x.toFixed(6)}) = ${xNext.toFixed(6)} \\)`);
-              if (Math.abs(xNext - x) < tolerance) {
+              const error = Math.abs(xNext - x);
+              steps.push(`Paso ${iterations + 1}: \\( x_${iterations + 1} = g(x_${iterations}) = g(${x.toFixed(6)}) = ${xNext.toFixed(6)} \\)`);
+              tableData.push({ n: iterations + 1, xn: x, gxn: xNext, error: error });
+              if (error < tolerance) {
                 converged = true;
                 break;
               }
@@ -269,14 +274,42 @@ input[type="number"] {
               ? `Raíz aproximada: \\( x = ${x.toFixed(6)} \\) (iteraciones: ${iterations})`
               : `No convergió en ${maxIter} iteraciones. Último valor: \\( x = ${x.toFixed(6)} \\)`;
             document.getElementById('method-result').innerHTML = `<p class="text-lg">$${result}$</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Iteración (n)</th>
+                    <th class="border p-2">\\( x_n \\)</th>
+                    <th class="border p-2">\\( g(x_n) \\)</th>
+                    <th class="border p-2">Error \\( |x_{n+1} - x_n| \\)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.n}</td>
+                      <td class="border p-2 text-center">${row.xn.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.gxn !== null ? row.gxn.toFixed(6) : '-'}</td>
+                      <td class="border p-2 text-center">${row.error !== null ? row.error.toFixed(6) : '-'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: Ecuación inválida o parámetros incorrectos.</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       },
@@ -304,15 +337,16 @@ input[type="number"] {
           const maxIter = parseInt(document.getElementById('newton-max-iter').value);
           let x = x0;
           let steps = [];
+          let tableData = [];
           let iterations = 0;
           let converged = false;
 
           try {
-            // Define factorial for use in eval
             const fact = factorial;
             const f = (x) => eval(equation); 
             const fPrime = (x) => eval(derivative);
-            steps.push(`\\( x_0 = ${x0.toFixed(6)} \\)`);
+            steps.push(`Paso 0: \\( x_0 = ${x0.toFixed(6)} \\)`);
+            tableData.push({ n: 0, xn: x0, fx: null, fpx: null, error: null });
 
             while (iterations < maxIter) {
               const fx = f(x);
@@ -321,8 +355,10 @@ input[type="number"] {
                 throw new Error('Derivada cercana a cero, método falla.');
               }
               const xNext = x - fx / fpx;
-              steps.push(`\\( x_${iterations + 1} = x_${iterations} - \\frac{f(x_${iterations})}{f\'(x_${iterations})} = ${x.toFixed(6)} - \\frac{${fx.toFixed(6)}}{${fpx.toFixed(6)}} = ${xNext.toFixed(6)} \\)`);
-              if (Math.abs(xNext - x) < tolerance || Math.abs(fx) < tolerance) {
+              const error = Math.abs(xNext - x);
+              steps.push(`Paso ${iterations + 1}: \\( x_${iterations + 1} = x_${iterations} - \\frac{f(x_${iterations})}{f\'(x_${iterations})} = ${x.toFixed(6)} - \\frac{${fx.toFixed(6)}}{${fpx.toFixed(6)}} = ${xNext.toFixed(6)} \\)`);
+              tableData.push({ n: iterations + 1, xn: x, fx: fx, fpx: fpx, error: error });
+              if (error < tolerance || Math.abs(fx) < tolerance) {
                 converged = true;
                 break;
               }
@@ -334,16 +370,47 @@ input[type="number"] {
               ? `Raíz aproximada: \\( x = ${x.toFixed(6)} \\) (iteraciones: ${iterations})`
               : `No convergió en ${maxIter} iteraciones. Último valor: \\( x = ${x.toFixed(6)} \\)`;
             document.getElementById('method-result').innerHTML = `<p class="text-lg">$${result}$</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Iteración (n)</th>
+                    <th class="border p-2">\\( x_n \\)</th>
+                    <th class="border p-2">\\( f(x_n) \\)</th>
+                    <th class="border p-2">\\( f'(x_n) \\)</th>
+                    <th class="border p-2">Error \\( |x_{n+1} - x_n| \\)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.n}</td>
+                      <td class="border p-2 text-center">${row.xn.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.fx !== null ? row.fx.toFixed(6) : '-'}</td>
+                      <td class="border p-2 text-center">${row.fpx !== null ? row.fpx.toFixed(6) : '-'}</td>
+                      <td class="border p-2 text-center">${row.error !== null ? row.error.toFixed(6) : '-'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
+        
       },
       'lagrange': {
         title: 'Método de Interpolación de Lagrange',
@@ -384,35 +451,63 @@ input[type="number"] {
 
             // Calculate Lagrange polynomial
             let polynomial = '';
+            let tableData = [];
             for (let i = 0; i < lagrangePoints.length; i++) {
               let term = lagrangePoints[i].y.toFixed(6);
-              let denominator = '';
-              let denomValue = 1;
+              let liValue = 1;
               for (let j = 0; j < lagrangePoints.length; j++) {
                 if (j !== i) {
                   term += ` \\cdot \\frac{x - ${lagrangePoints[j].x.toFixed(6)}}{${lagrangePoints[i].x.toFixed(6)} - ${lagrangePoints[j].x.toFixed(6)}}`;
-                  denomValue *= (lagrangePoints[i].x - lagrangePoints[j].x);
+                  liValue *= (xInterp - lagrangePoints[j].x) / (lagrangePoints[i].x - lagrangePoints[j].x);
                 }
               }
-              denominator += `\\ell_${i}(x) = ${term}`;
-              steps.push(`\\(${denominator}\\)`);
+              steps.push(`Paso ${i + 1}: \\( \\ell_${i}(x) = ${term} \\)`);
               polynomial += (lagrangePoints[i].y >= 0 ? ' + ' : ' - ') + `(${Math.abs(lagrangePoints[i].y).toFixed(6)}) \\cdot \\ell_${i}(x)`;
+              tableData.push({ i: i, xi: lagrangePoints[i].x, yi: lagrangePoints[i].y, li: liValue });
             }
-            steps.unshift(`\\( P(x) = ${polynomial}\\)`);
+            steps.unshift(`Paso 0: \\( P(x) = ${polynomial} \\)`);
 
             // Evaluate at xInterp
             let result = lagrangeInterpolate(xInterp, lagrangePoints);
-            steps.push(`\\( P(${xInterp.toFixed(6)}) = ${result.toFixed(6)} \\)`);
+            steps.push(`Paso ${lagrangePoints.length + 1}: \\( P(${xInterp.toFixed(6)}) = ${result.toFixed(6)} \\)`);
 
             document.getElementById('method-result').innerHTML = `<p class="text-lg">Valor interpolado en \\( x = ${xInterp.toFixed(6)} \\): \\( P(x) = ${result.toFixed(6)} \\)</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Punto \\( i \\)</th>
+                    <th class="border p-2">\\( x_i \\)</th>
+                    <th class="border p-2">\\( y_i \\)</th>
+                    <th class="border p-2">\\( \\ell_i(${xInterp.toFixed(6)}) \\)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.i}</td>
+                      <td class="border p-2 text-center">${row.xi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.yi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.li.toFixed(6)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Entrada inválida.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       },
@@ -456,14 +551,19 @@ input[type="number"] {
             // Compute divided differences
             const n = dividedDiffPoints.length;
             const f = Array(n).fill().map(() => Array(n).fill(0));
+            let tableData = [];
             for (let i = 0; i < n; i++) {
               f[i][0] = dividedDiffPoints[i].y;
-              steps.push(`\\( f[x_${i}] = ${f[i][0].toFixed(6)} \\)`);
+              steps.push(`Paso ${i + 1}: \\( f[x_${i}] = ${f[i][0].toFixed(6)} \\)`);
+              tableData.push({ i: i, xi: dividedDiffPoints[i].x, yi: dividedDiffPoints[i].y, diff: f[i][0] });
             }
+            let stepCounter = n + 1;
             for (let j = 1; j < n; j++) {
               for (let i = j; i < n; i++) {
                 f[i][j] = (f[i][j - 1] - f[i - 1][j - 1]) / (dividedDiffPoints[i].x - dividedDiffPoints[i - j].x);
-                steps.push(`\\( f[x_${i-j},\\ldots,x_${i}] = \\frac{f[x_${i-j+1},\\ldots,x_${i}] - f[x_${i-j},\\ldots,x_${i-1}]}{x_${i} - x_${i-j}} = \\frac{${f[i][j - 1].toFixed(6)} - ${f[i - 1][j - 1].toFixed(6)}}{${dividedDiffPoints[i].x.toFixed(6)} - ${dividedDiffPoints[i - j].x.toFixed(6)}} = ${f[i][j].toFixed(6)} \\)`);
+                steps.push(`Paso ${stepCounter}: \\( f[x_${i-j},\\ldots,x_${i}] = \\frac{f[x_${i-j+1},\\ldots,x_${i}] - f[x_${i-j},\\ldots,x_${i-1}]}{x_${i} - x_${i-j}} = \\frac{${f[i][j - 1].toFixed(6)} - ${f[i - 1][j - 1].toFixed(6)}}{${dividedDiffPoints[i].x.toFixed(6)} - ${dividedDiffPoints[i - j].x.toFixed(6)}} = ${f[i][j].toFixed(6)} \\)`);
+                if (i === j) tableData[i].diff = f[i][j];
+                stepCounter++;
               }
             }
 
@@ -475,21 +575,49 @@ input[type="number"] {
               polynomial += ` + ${f[i][i].toFixed(6)} \\cdot ${term}`;
             }
             polynomial += ` \\)`;
-            steps.unshift(polynomial);
+            steps.unshift(`Paso 0: ${polynomial}`);
 
             // Evaluate at xInterp
             let result = dividedDiffInterpolate(xInterp, dividedDiffPoints);
-            steps.push(`\\( P(${xInterp.toFixed(6)}) = ${result.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter}: \\( P(${xInterp.toFixed(6)}) = ${result.toFixed(6)} \\)`);
 
             document.getElementById('method-result').innerHTML = `<p class="text-lg">Valor interpolado en \\( x = ${xInterp.toFixed(6)} \\): \\( P(x) = ${result.toFixed(6)} \\)</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Punto \\( i \\)</th>
+                    <th class="border p-2">\\( x_i \\)</th>
+                    <th class="border p-2">\\( y_i \\)</th>
+                    <th class="border p-2">Diferencia Dividida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.i}</td>
+                      <td class="border p-2 text-center">${row.xi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.yi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.diff.toFixed(6)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Entrada inválida.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       },
@@ -537,24 +665,52 @@ input[type="number"] {
             const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
             const b = (sumY - m * sumX) / n;
 
-            steps.push(`\\( n = ${n} \\)`);
-            steps.push(`\\( \\sum x_i = ${sumX.toFixed(6)} \\)`);
-            steps.push(`\\( \\sum y_i = ${sumY.toFixed(6)} \\)`);
-            steps.push(`\\( \\sum x_i y_i = ${sumXY.toFixed(6)} \\)`);
-            steps.push(`\\( \\sum x_i^2 = ${sumX2.toFixed(6)} \\)`);
-            steps.push(`\\( m = \\frac{n \\sum x_i y_i - \\sum x_i \\sum y_i}{n \\sum x_i^2 - (\\sum x_i)^2} = \\frac{${n} \\cdot ${sumXY.toFixed(6)} - ${sumX.toFixed(6)} \\cdot ${sumY.toFixed(6)}}{${n} \\cdot ${sumX2.toFixed(6)} - (${sumX.toFixed(6)})^2} = ${m.toFixed(6)} \\)`);
-            steps.push(`\\( b = \\frac{\\sum y_i - m \\sum x_i}{n} = \\frac{${sumY.toFixed(6)} - ${m.toFixed(6)} \\cdot ${sumX.toFixed(6)}}{${n}} = ${b.toFixed(6)} \\)`);
-            steps.push(`\\( y = ${m.toFixed(6)}x + ${b.toFixed(6)} \\)`);
+            steps.push(`Paso 1: \\( n = ${n} \\)`);
+            steps.push(`Paso 2: \\( \\sum x_i = ${sumX.toFixed(6)} \\)`);
+            steps.push(`Paso 3: \\( \\sum y_i = ${sumY.toFixed(6)} \\)`);
+            steps.push(`Paso 4: \\( \\sum x_i y_i = ${sumXY.toFixed(6)} \\)`);
+            steps.push(`Paso 5: \\( \\sum x_i^2 = ${sumX2.toFixed(6)} \\)`);
+            steps.push(`Paso 6: \\( m = \\frac{n \\sum x_i y_i - \\sum x_i \\sum y_i}{n \\sum x_i^2 - (\\sum x_i)^2} = \\frac{${n} \\cdot ${sumXY.toFixed(6)} - ${sumX.toFixed(6)} \\cdot ${sumY.toFixed(6)}}{${n} \\cdot ${sumX2.toFixed(6)} - (${sumX.toFixed(6)})^2} = ${m.toFixed(6)} \\)`);
+            steps.push(`Paso 7: \\( b = \\frac{\\sum y_i - m \\sum x_i}{n} = \\frac{${sumY.toFixed(6)} - ${m.toFixed(6)} \\cdot ${sumX.toFixed(6)}}{${n}} = ${b.toFixed(6)} \\)`);
+            steps.push(`Paso 8: \\( y = ${m.toFixed(6)}x + ${b.toFixed(6)} \\)`);
 
             document.getElementById('method-result').innerHTML = `<p class="text-lg">Recta de regresión: \\( y = ${m.toFixed(6)}x + ${b.toFixed(6)} \\)</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Punto \\( i \\)</th>
+                    <th class="border p-2">\\( x_i \\)</th>
+                    <th class="border p-2">\\( y_i \\)</th>
+                    <th class="border p-2">\\( y_{\\text{pred}} \\)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${lsPoints.map((pt, i) => `
+                    <tr>
+                      <td class="border p-2 text-center">${i}</td>
+                      <td class="border p-2 text-center">${pt.x.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${pt.y.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${(m * pt.x + b).toFixed(6)}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Entrada inválida.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       },
@@ -597,36 +753,69 @@ input[type="number"] {
 
             // Calculate h
             const h = (b - a) / n;
-            steps.push(`\\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
+            steps.push(`Paso 1: \\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
 
             // Calculate points and function values
             let sum = 0;
+            let tableData = [];
+            let stepCounter = 2;
             for (let i = 0; i <= n; i++) {
               const x = a + i * h;
               const y = f(x);
-              steps.push(`\\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
-              steps.push(`\\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              steps.push(`Paso ${stepCounter}: \\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
+              steps.push(`Paso ${stepCounter + 1}: \\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              const weight = (i === 0 || i === n) ? 1 : 2;
+              tableData.push({ i: i, xi: x, fx: y, weight: weight });
               if (i === 0 || i === n) {
                 sum += y;
               } else {
                 sum += 2 * y;
               }
+              stepCounter += 2;
             }
 
             // Calculate integral
             const integral = (h / 2) * sum;
-            steps.push(`\\( \\sum f(x_i) = f(x_0) + 2 \\sum_{i=1}^{${n-1}} f(x_i) + f(x_n) = ${sum.toFixed(6)} \\)`);
-            steps.push(`\\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{h}{2} \\cdot \\sum f(x_i) = \\frac{${h.toFixed(6)}}{2} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter}: \\( \\sum f(x_i) = f(x_0) + 2 \\sum_{i=1}^{${n-1}} f(x_i) + f(x_n) = ${sum.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter + 1}: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{h}{2} \\cdot \\sum f(x_i) = \\frac{${h.toFixed(6)}}{2} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
 
             document.getElementById('method-result').innerHTML = `<p class="text-lg">Integral aproximada: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx ${integral.toFixed(6)} \\)</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Punto \\( i \\)</th>
+                    <th class="border p-2">\\( x_i \\)</th>
+                    <th class="border p-2">\\( f(x_i) \\)</th>
+                    <th class="border p-2">Peso</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.i}</td>
+                      <td class="border p-2 text-center">${row.xi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.fx.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.weight}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       },
@@ -672,17 +861,19 @@ input[type="number"] {
 
             // Calculate h
             const h = (b - a) / n;
-            steps.push(`\\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
+            steps.push(`Paso 1: \\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
 
             // Calculate points and function values
             let sum = 0;
-            const points = [];
+            let tableData = [];
+            let stepCounter = 2;
             for (let i = 0; i <= n; i++) {
               const x = a + i * h;
               const y = f(x);
-              points.push({ x, y });
-              steps.push(`\\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
-              steps.push(`\\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              steps.push(`Paso ${stepCounter}: \\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
+              steps.push(`Paso ${stepCounter + 1}: \\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              const weight = (i === 0 || i === n) ? 1 : (i % 2 === 1 ? 4 : 2);
+              tableData.push({ i: i, xi: x, fx: y, weight: weight });
               if (i === 0 || i === n) {
                 sum += y;
               } else if (i % 2 === 1) {
@@ -690,22 +881,51 @@ input[type="number"] {
               } else {
                 sum += 2 * y;
               }
+              stepCounter += 2;
             }
 
             // Calculate integral
             const integral = (h / 3) * sum;
-            steps.push(`\\( \\sum f(x_i) = f(x_0) + 4 \\sum_{i=1,3,\\ldots}^{${n-1}} f(x_i) + 2 \\sum_{i=2,4,\\ldots}^{${n-2}} f(x_i) + f(x_n) = ${points[0].y.toFixed(6)} + 4 \\cdot (${points.filter((_, i) => i % 2 === 1 && i !== n).map(pt => pt.y.toFixed(6)).join(' + ')}) + 2 \\cdot (${points.filter((_, i) => i % 2 === 0 && i !== 0 && i !== n).map(pt => pt.y.toFixed(6)).join(' + ')}) + ${points[n].y.toFixed(6)} = ${sum.toFixed(6)} \\)`);
-            steps.push(`\\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{h}{3} \\cdot \\sum f(x_i) = \\frac{${h.toFixed(6)}}{3} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter}: \\( \\sum f(x_i) = f(x_0) + 4 \\sum_{i=1,3,\\ldots}^{${n-1}} f(x_i) + 2 \\sum_{i=2,4,\\ldots}^{${n-2}} f(x_i) + f(x_n) = ${tableData[0].fx.toFixed(6)} + 4 \\cdot (${tableData.filter((_, i) => i % 2 === 1 && i !== n).map(row => row.fx.toFixed(6)).join(' + ')}) + 2 \\cdot (${tableData.filter((_, i) => i % 2 === 0 && i !== 0 && i !== n).map(row => row.fx.toFixed(6)).join(' + ')}) + ${tableData[n].fx.toFixed(6)} = ${sum.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter + 1}: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{h}{3} \\cdot \\sum f(x_i) = \\frac{${h.toFixed(6)}}{3} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
 
             document.getElementById('method-result').innerHTML = `<p class="text-lg">Integral aproximada: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx ${integral.toFixed(6)} \\)</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Punto \\( i \\)</th>
+                    <th class="border p-2">\\( x_i \\)</th>
+                    <th class="border p-2">\\( f(x_i) \\)</th>
+                    <th class="border p-2">Peso</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.i}</td>
+                      <td class="border p-2 text-center">${row.xi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.fx.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.weight}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       },
@@ -751,17 +971,19 @@ input[type="number"] {
 
             // Calculate h
             const h = (b - a) / n;
-            steps.push(`\\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
+            steps.push(`Paso 1: \\( h = \\frac{b - a}{n} = \\frac{${b.toFixed(6)} - ${a.toFixed(6)}}{${n}} = ${h.toFixed(6)} \\)`);
 
             // Calculate points and function values
             let sum = 0;
-            const points = [];
+            let tableData = [];
+            let stepCounter = 2;
             for (let i = 0; i <= n; i++) {
               const x = a + i * h;
               const y = f(x);
-              points.push({ x, y });
-              steps.push(`\\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
-              steps.push(`\\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              steps.push(`Paso ${stepCounter}: \\( x_${i} = a + i h = ${a.toFixed(6)} + ${i} \\cdot ${h.toFixed(6)} = ${x.toFixed(6)} \\)`);
+              steps.push(`Paso ${stepCounter + 1}: \\( f(x_${i}) = f(${x.toFixed(6)}) = ${y.toFixed(6)} \\)`);
+              const weight = (i === 0 || i === n) ? 1 : (i % 3 === 0 ? 2 : 3);
+              tableData.push({ i: i, xi: x, fx: y, weight: weight });
               if (i === 0 || i === n) {
                 sum += y;
               } else if (i % 3 === 0) {
@@ -769,24 +991,51 @@ input[type="number"] {
               } else {
                 sum += 3 * y;
               }
+              stepCounter += 2;
             }
 
             // Calculate integral
             const integral = (3 * h / 8) * sum;
-            const threeTerms = points.filter((_, i) => i !== 0 && i !== n && i % 3 !== 0).map(pt => pt.y.toFixed(6)).join(' + ');
-            const twoTerms = points.filter((_, i) => i !== 0 && i !== n && i % 3 === 0).map(pt => pt.y.toFixed(6)).join(' + ');
-            steps.push(`\\( \\sum f(x_i) = f(x_0) + 3 \\sum_{i=1,2,4,5,\\ldots}^{${n-1}} f(x_i) + 2 \\sum_{i=3,6,\\ldots}^{${n-3}} f(x_i) + f(x_n) = ${points[0].y.toFixed(6)} + 3 \\cdot (${threeTerms || '0'}) + 2 \\cdot (${twoTerms || '0'}) + ${points[n].y.toFixed(6)} = ${sum.toFixed(6)} \\)`);
-            steps.push(`\\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{3h}{8} \\cdot \\sum f(x_i) = \\frac{3 \\cdot ${h.toFixed(6)}}{8} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter}: \\( \\sum f(x_i) = f(x_0) + 3 \\sum_{i=1,2,4,5,\\ldots}^{${n-1}} f(x_i) + 2 \\sum_{i=3,6,\\ldots}^{${n-3}} f(x_i) + f(x_n) = ${tableData[0].fx.toFixed(6)} + 3 \\cdot (${tableData.filter((_, i) => i % 3 !== 0 && i !== 0 && i !== n).map(row => row.fx.toFixed(6)).join(' + ')}) + 2 \\cdot (${tableData.filter((_, i) => i % 3 === 0 && i !== 0 && i !== n).map(row => row.fx.toFixed(6)).join(' + ')}) + ${tableData[n].fx.toFixed(6)} = ${sum.toFixed(6)} \\)`);
+            steps.push(`Paso ${stepCounter + 1}: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx \\frac{3h}{8} \\cdot \\sum f(x_i) = \\frac{3 \\cdot ${h.toFixed(6)}}{8} \\cdot ${sum.toFixed(6)} = ${integral.toFixed(6)} \\)`);
 
             document.getElementById('method-result').innerHTML = `<p class="text-lg">Integral aproximada: \\( \\int_{${a.toFixed(6)}}^{${b.toFixed(6)}} f(x) \\, dx \\approx ${integral.toFixed(6)} \\)</p>`;
-            document.getElementById('method-steps').innerHTML = steps.map(step => `$$${step}$$`).join('<br>');
-            document.getElementById('method-steps').classList.add('hidden'); // Mantener oculto
+            document.getElementById('method-steps').innerHTML = steps.map(step => `<div class="mb-2">$${step}$</div>`).join('');
+            document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.remove('hidden');
-            MathJax.typeset(); // Render LaTeX
+
+            // Generar tabla
+            document.getElementById('method-table').innerHTML = `
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-blue-100 dark:bg-blue-900">
+                    <th class="border p-2">Punto \\( i \\)</th>
+                    <th class="border p-2">\\( x_i \\)</th>
+                    <th class="border p-2">\\( f(x_i) \\)</th>
+                    <th class="border p-2">Peso</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${tableData.map(row => `
+                    <tr>
+                      <td class="border p-2 text-center">${row.i}</td>
+                      <td class="border p-2 text-center">${row.xi.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.fx.toFixed(6)}</td>
+                      <td class="border p-2 text-center">${row.weight}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.remove('hidden');
+            MathJax.typeset();
           } catch (e) {
             document.getElementById('method-result').innerHTML = `<p class="text-lg text-red-500">Error: ${e.message || 'Ecuación inválida o parámetros incorrectos.'}</p>`;
             document.getElementById('method-steps').classList.add('hidden');
             document.getElementById('toggle-steps').classList.add('hidden');
+            document.getElementById('method-table').classList.add('hidden');
+            document.getElementById('toggle-table').classList.add('hidden');
           }
         }
       }
@@ -804,6 +1053,10 @@ input[type="number"] {
         document.getElementById('method-steps').innerHTML = '';
         document.getElementById('method-steps').classList.add('hidden');
         document.getElementById('toggle-steps').classList.add('hidden');
+        document.getElementById('method-table').innerHTML = ''; // Limpiar tabla
+        document.getElementById('method-table').classList.add('hidden'); // Ocultar tabla
+        document.getElementById('toggle-table').classList.add('hidden'); // Ocultar botón de tabla
+        updateToggleButtons(); // Asegurar que los botones tengan el texto correcto
         MathJax.typeset();
         if (method === 'fixed-point') {
           const calculateBtn = document.getElementById('fp-calculate');
@@ -968,14 +1221,33 @@ input[type="number"] {
     document.getElementById('method-steps').innerHTML = '';
     document.getElementById('method-steps').classList.add('hidden');
     document.getElementById('toggle-steps').classList.add('hidden');
+    document.getElementById('method-table').innerHTML = ''; // Limpiar tabla
+    document.getElementById('method-table').classList.add('hidden'); // Ocultar tabla
+    document.getElementById('toggle-table').classList.add('hidden'); // Ocultar botón de tabla
+    updateToggleButtons(); // Asegurar que los botones tengan el texto correcto
     MathJax.typeset();
     });
+
+    // Función para actualizar el texto de los botones de pasos y tabla
+    function updateToggleButtons() {
+      const stepsDiv = document.getElementById('method-steps');
+      const tableDiv = document.getElementById('method-table');
+      document.getElementById('toggle-steps').textContent = stepsDiv.classList.contains('hidden') ? 'Mostrar Pasos' : 'Ocultar Pasos';
+      document.getElementById('toggle-table').textContent = tableDiv.classList.contains('hidden') ? 'Tabla' : 'Ocultar Tabla';
+    }
 
     // Toggle steps visibility
     document.getElementById('toggle-steps').addEventListener('click', () => {
       const stepsDiv = document.getElementById('method-steps');
       stepsDiv.classList.toggle('hidden');
-      document.getElementById('toggle-steps').textContent = stepsDiv.classList.contains('hidden') ? 'Mostrar Pasos' : 'Ocultar Pasos';
+      updateToggleButtons();
+    });
+
+    // Toggle table visibility
+    document.getElementById('toggle-table').addEventListener('click', () => {
+      const tableDiv = document.getElementById('method-table');
+      tableDiv.classList.toggle('hidden');
+      updateToggleButtons();
     });
 
     // Virtual Keyboard Logic

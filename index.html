@@ -30,21 +30,47 @@ input[type="number"] {
       text-align: center;
     }
     #sidebar-title {
-      cursor: pointer; /* Indica que es clicable */
+    cursor: pointer;
+  }
+  #sidebar-logo {
+    max-width: 200px;
+    margin-top: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+  /* Estilos para el botón hamburguesa */
+  #menu-toggle.open .hamburger-icon:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  #menu-toggle.open .hamburger-icon:nth-child(2) {
+    opacity: 0;
+  }
+  #menu-toggle.open .hamburger-icon:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+  /* Ajustar el teclado virtual para móviles */
+  @media (max-width: 640px) {
+    #virtual-keyboard {
+      min-width: 100%;
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      bottom: 0;
+      left: 0;
+      transform: none;
     }
-    #sidebar-logo {
-      max-width: 200px; /* Tamaño  */
-      margin-top: 0.5rem; /* Espacio superior */
-      margin-left: auto; /* Centrado */
-      margin-right: auto; /* Centrado */
-      display: block; /* Centrado */
+    .kbd-btn {
+      min-width: 0;
+      padding: 8px;
+      font-size: 12px;
     }
   </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <div class="w-64 bg-white dark:bg-gray-800 shadow-lg p-4">
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 shadow-lg p-4 transform -translate-x-full md:translate-x-0 md:static md:w-64 transition-transform duration-300 ease-in-out z-50">
       <h1 id="sidebar-title" class="text-2xl font-bold mb-4 hover:text-blue-500 cursor-pointer">Métodos Numéricos</h1>
       <img id="sidebar-logo" src="https://www.acatlan.unam.mx/identidad-acatlan/img/Logotipos/Logotipo/logo-blancoBis.jpg" alt="Logo FES Acatlán" class="mb-6">
       <ul>
@@ -60,6 +86,12 @@ input[type="number"] {
     </div>
     <!-- Main Content -->
     <div class="flex-1 p-6 overflow-auto">
+      <!-- Botón Hamburguesa -->
+      <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-50 focus:outline-none">
+        <span class="hamburger-icon block w-6 h-0.5 bg-gray-900 dark:bg-gray-100 mb-1.5 transition-all duration-300"></span>
+        <span class="hamburger-icon block w-6 h-0.5 bg-gray-900 dark:bg-gray-100 mb-1.5 transition-all duration-300"></span>
+        <span class="hamburger-icon block w-6 h-0.5 bg-gray-900 dark:bg-gray-100 transition-all duration-300"></span>
+      </button>
     <div id="method-content" class="max-w-4xl mx-auto">
         <h2 id="method-title" class="text-3xl font-semibold mb-4"> Importancia de los Métodos Numéricos en la Resolución de Problemas Complejos </h2>
     <div id="method-description" class="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded">
@@ -220,13 +252,13 @@ input[type="number"] {
         description: 'El método de punto fijo encuentra la raíz de una ecuación no lineal \\( f(x) = 0 \\) reescribiéndola como \\( x = g(x) \\) e iterando \\( x_{n+1} = g(x_n) \\) hasta que converge.',
         input: `
           <label class="block mb-2">Ecuación g(x)</label>
-          <input id="fp-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'Math.cos(x)' o 'x/2 + 1'">
+          <input id="fp-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'Math.cos(x)' o 'x/2 + 1'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Valor inicial (x0)</label>
-          <input id="fp-initial" type="number" step="any" class="w-full p-2 border rounded" placeholder="0">
+          <input id="fp-initial" type="number" step="any" class="w-full p-2 border rounded" placeholder="0" data-readonly-mobile>
           <label class="block mb-2 mt-4">Tolerancia</label>
-          <input id="fp-tolerance" type="number" step="any" class="w-full p-2 border rounded" value="0.0001">
+          <input id="fp-tolerance" type="number" step="any" class="w-full p-2 border rounded" value="0.0001" data-readonly-mobile>
           <label class="block mb-2 mt-4">Máximo de iteraciones</label>
-          <input id="fp-max-iter" type="number" class="w-full p-2 border rounded" value="100">
+          <input id="fp-iter" type="number" class="w-full p-2 border rounded" value="100" data-readonly-mobile>
           <button id="fp-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -307,15 +339,15 @@ input[type="number"] {
         description: 'El método de Newton encuentra la raíz de una ecuación no lineal \\( f(x) = 0 \\) iterando \\( x_{n+1} = x_n - \\frac{f(x_n)}{f\'(x_n)} \\), donde \\( f\'(x) \\) es la derivada de \\( f(x) \\). Requiere una adivinanza inicial y converge rápidamente si la inicial es buena.',
         input: `
           <label class="block mb-2">Ecuación f(x)</label>
-          <input id="newton-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x - 2' o 'Math.sin(x) - x/3'">
+          <input id="newton-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x - 2' o 'Math.sin(x) - x/3'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Derivada f'(x)</label>
-          <input id="newton-derivative" type="text" class="w-full p-2 border rounded" placeholder="ej. '2*x' o 'Math.cos(x) - 1/3'">
+          <input id="newton-derivative" type="text" class="w-full p-2 border rounded" placeholder="ej. '2*x' o 'Math.cos(x) - 1/3'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Valor inicial (x0)</label>
-          <input id="newton-initial" type="number" step="any" class="w-full p-2 border rounded" placeholder="0">
+          <input id="newton-initial" type="number" step="any" class="w-full p-2 border rounded" placeholder="0" data-readonly-mobile>
           <label class="block mb-2 mt-4">Tolerancia</label>
-          <input id="newton-tolerance" type="number" step="any" class="w-full p-2 border rounded" value="0.0001">
+          <input id="newton-tolerance" type="number" step="any" class="w-full p-2 border rounded" value="0.0001" data-readonly-mobile>
           <label class="block mb-2 mt-4">Máximo de iteraciones</label>
-          <input id="newton-max-iter" type="number" class="w-full p-2 border rounded" value="100">
+          <input id="newton-iter" type="number" class="w-full p-2 border rounded" value="100" data-readonly-mobile>
           <button id="newton-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -406,9 +438,9 @@ input[type="number"] {
         description: 'El método de interpolación de Lagrange construye un polinomio que pasa exactamente por un conjunto de puntos \\( (x_i, y_i) \\). El polinomio se define como \\( P(x) = \\sum_{i=0}^n y_i \\ell_i(x) \\), donde \\( \\ell_i(x) = \\prod_{j \\neq i} \\frac{x - x_j}{x_i - x_j} \\).',
         input: `
           <label class="block mb-2">Puntos (x,y) separados por comas</label>
-          <input id="lagrange-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,2, 2,4'">
+          <input id="lagrange-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,2, 2,4'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Valor x para interpolar</label>
-          <input id="lagrange-x" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1.5">
+          <input id="lagrange-x" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1.5" data-readonly-mobile>
           <button id="lagrange-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -505,9 +537,9 @@ input[type="number"] {
         description: 'El método de diferencias divididas construye un polinomio de interpolación de Newton para un conjunto de puntos \\( (x_i, y_i) \\). El polinomio se expresa como \\( P(x) = f[x_0] + f[x_0,x_1](x-x_0) + \\cdots + f[x_0,\\ldots,x_n](x-x_0)\\cdots(x-x_{n-1}) \\), donde \\( f[x_i,\\ldots,x_j] \\) son las diferencias divididas.',
         input: `
           <label class="block mb-2">Puntos (x,y) separados por comas</label>
-          <input id="divided-diff-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,2, 2,4'">
+          <input id="divided-diff-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,2, 2,4'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Valor x para interpolar</label>
-          <input id="divided-diff-x" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1.5">
+          <input id="divided-diff-x" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1.5" data-readonly-mobile>
           <button id="divided-diff-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -615,7 +647,7 @@ input[type="number"] {
         description: 'El método de mínimos cuadrados encuentra la recta de mejor ajuste \\( y = mx + b \\) que minimiza la suma de los cuadrados de los errores para un conjunto de puntos \\( (x_i, y_i) \\). Los coeficientes se calculan como \\( m = \\frac{n \\sum x_i y_i - \\sum x_i \\sum y_i}{n \\sum x_i^2 - (\\sum x_i)^2} \\), \\( b = \\frac{\\sum y_i - m \\sum x_i}{n} \\).',
         input: `
           <label class="block mb-2">Puntos (x,y) separados por comas</label>
-          <input id="ls-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,1.2, 2,2.1, 3,3.3'">
+          <input id="ls-points" type="text" class="w-full p-2 border rounded" placeholder="ej. '0,1, 1,1.2, 2,2.1, 3,3.3'" data-readonly-mobile>
           <button id="ls-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -708,13 +740,13 @@ input[type="number"] {
         description: 'La regla del trapecio aproxima la integral definida \\( \\int_a^b f(x) \\, dx \\) dividiendo el intervalo \\([a, b]\\) en \\( n \\) subintervalos de ancho \\( h = \\frac{b-a}{n} \\). La fórmula es \\( \\int_a^b f(x) \\, dx \\approx \\frac{h}{2} \\left[ f(x_0) + 2 \\sum_{i=1}^{n-1} f(x_i) + f(x_n) \\right] \\), donde \\( x_i = a + i h \\).',
         input: `
           <label class="block mb-2">Función f(x)</label>
-          <input id="trapezoid-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'">
+          <input id="trapezoid-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Límite inferior (a)</label>
-          <input id="trapezoid-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0">
+          <input id="trapezoid-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0" data-readonly-mobile>
           <label class="block mb-2 mt-4">Límite superior (b)</label>
-          <input id="trapezoid-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1">
+          <input id="trapezoid-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1" data-readonly-mobile>
           <label class="block mb-2 mt-4">Número de subintervalos (n)</label>
-          <input id="trapezoid-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 4">
+          <input id="trapezoid-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 4" data-readonly-mobile>
           <button id="trapezoid-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -813,13 +845,13 @@ input[type="number"] {
         description: 'La regla de Simpson 1/3 aproxima la integral definida \\( \\int_a^b f(x) \\, dx \\) dividiendo el intervalo \\([a, b]\\) en \\( n \\) subintervalos (\\( n \\) par) de ancho \\( h = \\frac{b-a}{n} \\). La fórmula es \\( \\int_a^b f(x) \\, dx \\approx \\frac{h}{3} \\left[ f(x_0) + 4 \\sum_{i=1,3,\\ldots}^{n-1} f(x_i) + 2 \\sum_{i=2,4,\\ldots}^{n-2} f(x_i) + f(x_n) \\right] \\), donde \\( x_i = a + i h \\).',
         input: `
           <label class="block mb-2">Función f(x)</label>
-          <input id="simpson13-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'">
+          <input id="simpson13-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Límite inferior (a)</label>
-          <input id="simpson13-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0">
+          <input id="simpson13-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0" data-readonly-mobile>
           <label class="block mb-2 mt-4">Límite superior (b)</label>
-          <input id="simpson13-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1">
-          <label class="block mb-2 mt-4">Número de subintervalos (n, debe ser par)</label>
-          <input id="simpson13-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 4">
+          <input id="simpson13-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1" data-readonly-mobile>
+          <label class="block mb-2 mt-4">Número de subintervalos (n, par)</label>
+          <input id="simpson13-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 4" data-readonly-mobile>
           <button id="simpson13-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -923,13 +955,13 @@ input[type="number"] {
         description: 'La regla de Simpson 3/8 aproxima la integral definida \\( \\int_a^b f(x) \\, dx \\) dividiendo el intervalo \\([a, b]\\) en \\( n \\) subintervalos (\\( n \\) múltiplo de 3) de ancho \\( h = \\frac{b-a}{n} \\). La fórmula es \\( \\int_a^b f(x) \\, dx \\approx \\frac{3h}{8} \\left[ f(x_0) + 3 \\sum_{i=1,2,4,5,\\ldots}^{n-1} f(x_i) + 2 \\sum_{i=3,6,\\ldots}^{n-3} f(x_i) + f(x_n) \\right] \\), donde \\( x_i = a + i h \\).',
         input: `
           <label class="block mb-2">Función f(x)</label>
-          <input id="simpson38-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'">
+          <input id="simpson38-equation" type="text" class="w-full p-2 border rounded" placeholder="ej. 'x*x' o 'Math.sin(x)'" data-readonly-mobile>
           <label class="block mb-2 mt-4">Límite inferior (a)</label>
-          <input id="simpson38-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0">
+          <input id="simpson38-a" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 0" data-readonly-mobile>
           <label class="block mb-2 mt-4">Límite superior (b)</label>
-          <input id="simpson38-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1">
-          <label class="block mb-2 mt-4">Número de subintervalos (n, debe ser múltiplo de 3)</label>
-          <input id="simpson38-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 3">
+          <input id="simpson38-b" type="number" step="any" class="w-full p-2 border rounded" placeholder="ej. 1" data-readonly-mobile>
+          <label class="block mb-2 mt-4">Número de subintervalos (n, divisible por 3)</label>
+          <input id="simpson38-n" type="number" class="w-full p-2 border rounded" placeholder="ej. 3" data-readonly-mobile>
           <button id="simpson38-calculate" class="mt-4 bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Calcular</button>
         `,
         calculate: function() {
@@ -1242,52 +1274,75 @@ input[type="number"] {
     // Virtual Keyboard Logic
     let activeInput = null;
 
-    function showVirtualKeyboard(event) {
-      activeInput = event.target;
-      const keyboard = document.getElementById('virtual-keyboard');
-      if (keyboard) {
-        keyboard.classList.remove('hidden');
-      }
-      // Add event listeners to keyboard buttons
-      document.querySelectorAll('.kbd-btn').forEach(btn => {
-        btn.removeEventListener('click', handleKeyboardClick); // Prevent multiple listeners
-        btn.addEventListener('click', handleKeyboardClick);
-      });
-    }
+   // Detectar si es un dispositivo móvil basado en el ancho de pantalla
+function isMobileDevice() {
+  return window.innerWidth >= 320 && window.innerWidth < 768; // Entre 320px y 768px
+}
 
-        function handleKeyboardClick(event) {
-      const value = event.target.dataset.value;
-      if (!activeInput) return;
+// Aplicar readonly a inputs en móviles al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+  if (isMobileDevice()) {
+    document.querySelectorAll('input[data-readonly-mobile]').forEach(input => {
+      input.setAttribute('readonly', 'readonly');
+    });
+  }
+});
 
-      if (value === 'clear') {
-        activeInput.value = '';
-      } else if (value === 'ok') {
-        let currentValue = activeInput.value;
-        const functionPrefixes = [
-          'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.asin(', 'Math.acos(', 'Math.atan(',
-          'Math.sinh(', 'Math.cosh(', 'Math.tanh(', 'Math.sqrt(', 'Math.log(', 'Math.log10(',
-          'Math.exp('
-        ];
-        for (const prefix of functionPrefixes) {
-          if (currentValue.includes(prefix) && !currentValue.endsWith(')')) {
-            currentValue += ')';
-          }
-        }
-        activeInput.value = currentValue;
-        document.getElementById('virtual-keyboard').classList.add('hidden');
-        activeInput = null;
-      } else {
-        // Insert value at cursor position
-        const start = activeInput.selectionStart;
-        const end = activeInput.selectionEnd;
-        const textBefore = activeInput.value.substring(0, start);
-        const textAfter = activeInput.value.substring(end);
-        activeInput.value = textBefore + value + textAfter;
-        // Move cursor to end of inserted value
-        activeInput.selectionStart = activeInput.selectionEnd = start + value.length;
+function showVirtualKeyboard(event) {
+  activeInput = event.target;
+  const keyboard = document.getElementById('virtual-keyboard');
+  if (keyboard) {
+    keyboard.classList.remove('hidden');
+  }
+  // Quitar readonly temporalmente en móviles para permitir entrada
+  if (isMobileDevice()) {
+    activeInput.removeAttribute('readonly');
+    activeInput.focus();
+  }
+  // Add event listeners to keyboard buttons
+  document.querySelectorAll('.kbd-btn').forEach(btn => {
+    btn.removeEventListener('click', handleKeyboardClick); // Prevent multiple listeners
+    btn.addEventListener('click', handleKeyboardClick);
+  });
+}
+
+// Restaurar readonly en móviles después de interactuar con el teclado virtual
+function handleKeyboardClick(event) {
+  const value = event.target.dataset.value;
+  if (!activeInput) return;
+
+  if (value === 'clear') {
+    activeInput.value = '';
+  } else if (value === 'ok') {
+    let currentValue = activeInput.value;
+    const functionPrefixes = [
+      'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.asin(', 'Math.acos(', 'Math.atan(',
+      'Math.sinh(', 'Math.cosh(', 'Math.tanh(', 'Math.sqrt(', 'Math.log(', 'Math.log10(',
+      'Math.exp('
+    ];
+    for (const prefix of functionPrefixes) {
+      if (currentValue.includes(prefix) && !currentValue.endsWith(')')) {
+        currentValue += ')';
       }
-      activeInput.focus();
     }
+    activeInput.value = currentValue;
+    document.getElementById('virtual-keyboard').classList.add('hidden');
+    if (isMobileDevice()) {
+      activeInput.setAttribute('readonly', 'readonly'); // Restaurar readonly
+    }
+    activeInput = null;
+  } else {
+    // Insert value at cursor position
+    const start = activeInput.selectionStart;
+    const end = activeInput.selectionEnd;
+    const textBefore = activeInput.value.substring(0, start);
+    const textAfter = activeInput.value.substring(end);
+    activeInput.value = textBefore + value + textAfter;
+    // Move cursor to end of inserted value
+    activeInput.selectionStart = activeInput.selectionEnd = start + value.length;
+  }
+  activeInput.focus();
+}
 
     // Hide keyboard when clicking outside
     document.addEventListener('click', (event) => {
@@ -1296,6 +1351,15 @@ input[type="number"] {
         keyboard.classList.add('hidden');
         activeInput = null;
       }
+    });
+
+    // Toggle sidebar with hamburger menu
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('translate-x-0');
+    sidebar.classList.toggle('-translate-x-full');
+    menuToggle.classList.toggle('open');
     });
   </script>
 </body>

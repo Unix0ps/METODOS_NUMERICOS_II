@@ -94,62 +94,51 @@ input[type="number"] {
       <!-- Virtual Keyboard -->
       <div id="virtual-keyboard" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg z-50 hidden">
         <div class="grid grid-cols-8 gap-2">
-          <!-- Numbers -->
+          <!-- Primera fila: Números y operadores -->
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="7">7</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="8">8</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="9">9</button>
-          <!-- Operators -->
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="/">÷</button>
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="*">×</button>
-          <!-- Functions -->
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.sin(">sin</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.cos(">cos</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.tan(">tan</button>
-          <!-- Numbers -->
+          <!-- Segunda fila: Números y funciones -->
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="4">4</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="5">5</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="6">6</button>
-          <!-- Operators -->
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="-">-</button>
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="+">+</button>
-          <!-- Functions -->
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.asin(">arcsin</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.acos(">arccos</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.atan(">arctan</button>
-          <!-- Numbers -->
+          <!-- Tercera fila: Números y operadores -->
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="1">1</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="2">2</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="3">3</button>
-          <!-- Operators -->
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="^">^</button>
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="(">(</button>
-          <!-- Functions -->
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.sinh(">sinh</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.cosh(">cosh</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.tanh(">tanh</button>
-          <!-- Numbers -->
+          <!-- Cuarta fila: Punto, coma y funciones -->
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value="0">0</button>
           <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value=".">.</button>
-          <!-- Operators -->
+          <button class="kbd-btn bg-gray-200 dark:bg-gray-700 p-2 rounded hover:bg-gray-300 dark:hover:bg-gray-600" data-value=",">,</button>
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value=")">)</button>
           <button class="kbd-btn bg-gray-400 dark:bg-gray-600 p-2 rounded hover:bg-gray-500 dark:hover:bg-gray-500" data-value="(/)">/</button>
-          <!-- Functions -->
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.sqrt(">√</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.log(">ln</button>
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.log10(">log₁₀</button>
+          <!-- Quinta fila: Variables y botones especiales -->
           <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.exp(">e^</button>
-          <!-- Variables -->
           <button class="kbd-btn bg-green-500 text-white p-2 rounded hover:bg-green-600" data-value="x">x</button>
           <button class="kbd-btn bg-green-500 text-white p-2 rounded hover:bg-green-600" data-value="y">y</button>
           <button class="kbd-btn bg-green-500 text-white p-2 rounded hover:bg-green-600" data-value="z">z</button>
-          <!-- Constants -->
           <button class="kbd-btn bg-purple-500 text-white p-2 rounded hover:bg-purple-600" data-value="Math.PI">π</button>
           <button class="kbd-btn bg-purple-500 text-white p-2 rounded hover:bg-purple-600" data-value="Math.E">e</button>
-          <!-- Controls -->
           <button class="kbd-btn bg-red-500 text-white p-2 rounded hover:bg-red-600" data-value="clear">C</button>
           <button class="kbd-btn bg-green-600 text-white p-2 rounded hover:bg-green-700" data-value="ok">OK</button>
-          <!-- Additional Functions -->
-          <button class="kbd-btn bg-blue-500 text-white p-2 rounded hover:bg-blue-600" data-value="Math.pow(">x^y</button>
         </div>
       </div>
     </div>
@@ -1266,19 +1255,18 @@ input[type="number"] {
       });
     }
 
-    function handleKeyboardClick(event) {
+        function handleKeyboardClick(event) {
       const value = event.target.dataset.value;
       if (!activeInput) return;
 
       if (value === 'clear') {
         activeInput.value = '';
       } else if (value === 'ok') {
-        
         let currentValue = activeInput.value;
         const functionPrefixes = [
           'Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.asin(', 'Math.acos(', 'Math.atan(',
           'Math.sinh(', 'Math.cosh(', 'Math.tanh(', 'Math.sqrt(', 'Math.log(', 'Math.log10(',
-          'Math.exp(', 'Math.pow('
+          'Math.exp('
         ];
         for (const prefix of functionPrefixes) {
           if (currentValue.includes(prefix) && !currentValue.endsWith(')')) {

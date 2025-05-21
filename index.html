@@ -28,15 +28,17 @@ input[type="number"] {
       border-radius: 10px; /* Esquinas redondeadas */
     }
     .kbd-btn {
-      min-width: 30px; /* Tamaño uniforme para los botones */
-      text-align: center;
-      font-size: clamp(12px, 5vw, 16px); /* Tamanho responsivo: mínimo 12px, máximo 16px y ajustado a la anchura de la vista */
-      line-height: 1; /* Altura de línea igual al tamaño de la fuente para centrar el texto */
-      padding: 4px 8px; /* Un poco de espacio dentro del botón */
-      border: 1px solid #ccc; /* Borde para visualizar mejor */
-      display: inline-block; /* Para evitar que el botón se estire */
-    }
-    
+  min-width: 30px; /* Ancho mínimo para los botones */
+  text-align: center;
+  font-size: clamp(12px, 5vw, 16px); /* Tamaño responsivo: mínimo 12px, máximo 16px, y ajustado a la anchura de la vista */
+  line-height: 1; /* Altura de línea igual al tamaño de la fuente para centrar el texto */
+  padding: 4px 8px; /* Espaciado interno para que el texto no esté pegado a los bordes */
+  border: 1px solid #ccc; /* Borde para visualizar el botón */
+  display: inline-block; /* Hace que el ancho dependa del contenido */
+  width: auto; /* El ancho del botón dependerá del contenido (texto) */
+  white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+  text-overflow: ellipsis; /* Si el texto es demasiado largo, se corta con "..." (opcional) */
+}   
     #sidebar-title {
     cursor: pointer;
   }
@@ -49,10 +51,30 @@ input[type="number"] {
     display: block;
   }
   #sidebar{
- height: 100vh;
+    position: fixed;
+    left: -250px; /* Inicia fuera de la pantalla */
+    height: calc(100vh - 20px); /* Ajusta la altura para compensar cualquier espacio que podría estar ocupado por barras del navegador */
     background-color: #000000;
+    transition: left 0.3s ease; /* Animación de deslizamiento */
+  z-index: 1000; /* Para asegurarse de que esté encima de todo */
+  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.3); /* Sombras para darle profundidad */
   }
 
+  /* Cuando el sidebar se activa, se desliza hacia la derecha */
+#sidebar.active {
+  left: 0; /* Lo coloca en la pantalla */
+}
+
+/* Media query para pantallas pequeñas */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 250px; /* Ajusta el tamaño del sidebar en pantallas pequeñas */
+  }
+  #sidebar.active {
+    left: 0; /* El sidebar estará visible al hacer hover o cuando sea activado */
+  }
+
+    
     /* Colores FES */
   .text-azulFES {
     color: #B88402 /* Dorado institucional */

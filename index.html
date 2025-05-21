@@ -36,12 +36,10 @@ input[type="number"] {
   }   
 
  @media (max-width: 1024px) {
+  // Deshabilitar todos los campos de entrada en dispositivos móviles
   const inputs = document.querySelectorAll('input, textarea');
   inputs.forEach(input => {
-    input.addEventListener('focus', (e) => {
-      e.preventDefault();
-      input.blur(); // Fuerza el desenfoque para evitar que el teclado aparezca
-    });
+    input.setAttribute('disabled', true);
   });
 }
 

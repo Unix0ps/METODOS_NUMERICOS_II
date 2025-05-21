@@ -35,6 +35,17 @@ input[type="number"] {
   text-overflow: ellipsis; /* Si el texto es demasiado largo, se corta con "..." */
   }   
 
+ @media (max-width: 1024px) {
+  const inputs = document.querySelectorAll('input, textarea');
+  inputs.forEach(input => {
+    input.addEventListener('focus', (e) => {
+      e.preventDefault();
+      input.blur(); // Fuerza el desenfoque para evitar que el teclado aparezca
+    });
+  });
+}
+
+    
   @media (min-width: 768px) and (max-width: 1024px)  {
     /* Estilos para pantallas con un poco más de ancho que de alto */
 

@@ -23,12 +23,11 @@ input[type="number"] {
     }
     #virtual-keyboard {
       z-index: 1000 !important; /* Asegura que el teclado esté por encima de todo */
-      min-width: 200px; /* Ancho mínimo para el teclado */
+      min-width: 250px; /* Ancho mínimo para el teclado */
       bottom: 0; /* Lo posiciona en la parte inferior */
-      border-radius: 10px; /* Esquinas redondeadas */
+      border-radius: 5px; /* Esquinas redondeadas */
     }
     .kbd-btn {
-  min-width: 30px; /* Ancho mínimo para los botones */
   text-align: center;
   font-size: clamp(12px, 5vw, 16px); /* Tamaño responsivo: mínimo 12px, máximo 16px, y ajustado a la anchura de la vista */
   line-height: 1; /* Altura de línea igual al tamaño de la fuente para centrar el texto */
@@ -51,10 +50,18 @@ input[type="number"] {
     display: block;
   }
   #sidebar{
-    height: calc(100vh - 20px); /* Ajusta la altura para compensar cualquier espacio que podría estar ocupado por barras del navegador */
+    height: 100vh;
+    min-height: 100vh;
     background-color: #000000;
   box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.3); /* Sombras para darle profundidad */
   } 
+
+  @media (max-width: 768px) {
+  #sidebar {
+    min-height: 100vh; /* Asegura que en pantallas pequeñas siempre ocupe toda la altura */
+  }
+}  
+    
     /* Colores FES */
   .text-azulFES {
     color: #B88402 /* Dorado institucional */

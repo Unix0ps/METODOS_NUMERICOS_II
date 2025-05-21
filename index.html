@@ -23,7 +23,7 @@ input[type="number"] {
     }
     #virtual-keyboard {
       z-index: 1000 !important; /* Asegura que el teclado esté por encima de todo */
-      min-width: 350px; /* Ancho mínimo para el teclado */
+      min-width: 450px; /* Ancho mínimo para el teclado */
       bottom: 0; /* Lo posiciona en la parte inferior */
       border-radius: 5px; /* Esquinas redondeadas */
     }
@@ -33,8 +33,7 @@ input[type="number"] {
   line-height: 1; /* Altura de línea igual al tamaño de la fuente para centrar el texto */
   padding: 4px 8px; /* Espaciado interno para que el texto no esté pegado a los bordes */
   border: 1px solid #ccc; /* Borde para visualizar el botón */
-  display: inline-block; /* Hace que el ancho dependa del contenido */
-  min-width: 20px /* El ancho del botón dependerá del contenido (texto) */
+  min-width: 50px /* El ancho del botón dependerá del contenido (texto) */
   white-space: nowrap; /* Evita que el texto se divida en varias líneas */
   text-overflow: ellipsis; /* Si el texto es demasiado largo, se corta con "..." */
 }   
@@ -55,12 +54,6 @@ input[type="number"] {
     background-color: #000000;
   box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.3); /* Sombras para darle profundidad */
   } 
-
-  @media (max-width: 768px) {
-  #sidebar {
-    min-height: 100vh; /* Asegura que en pantallas pequeñas siempre ocupe toda la altura */
-  }
-}  
     
     /* Colores FES */
   .text-azulFES {

@@ -34,16 +34,7 @@ input[type="number"] {
   white-space: nowrap; /* Evita que el texto se divida en varias líneas */
   text-overflow: ellipsis; /* Si el texto es demasiado largo, se corta con "..." */
   }   
-
- @media (max-width: 1024px) {
-  // Deshabilitar todos los campos de entrada en dispositivos móviles
-  const inputs = document.querySelectorAll('input, textarea');
-  inputs.forEach(input => {
-    input.setAttribute('disabled', true);
-  });
-}
-
-    
+  
   @media (min-width: 768px) and (max-width: 1024px)  {
     /* Estilos para pantallas con un poco más de ancho que de alto */
 
